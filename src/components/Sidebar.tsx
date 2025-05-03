@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useReels } from "@/hooks/useReels";
-import { ChevronRight, ChevronLeft, Home, Settings, Film, Utensils, Tool } from "lucide-react";
+import { ChevronRight, ChevronLeft, Home, Settings, Film, Utensils, Wrench } from "lucide-react";
 import { Category } from "@/lib/types";
 
 export function Sidebar() {
@@ -15,7 +15,7 @@ export function Sidebar() {
     { id: 'All', name: 'All', icon: <Home size={20} /> },
     { id: 'Recipes', name: 'Recipes', icon: <Utensils size={20} /> },
     { id: 'Movies', name: 'Movies', icon: <Film size={20} /> },
-    { id: 'Tools', name: 'Tools', icon: <Tool size={20} /> },
+    { id: 'Tools', name: 'Tools', icon: <Wrench size={20} /> },
   ];
 
   return (
