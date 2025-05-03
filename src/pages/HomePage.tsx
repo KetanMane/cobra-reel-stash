@@ -11,11 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical, Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { NotesDialog } from "@/components/NotesDialog";
 
 export default function HomePage() {
   const { filteredReels, activeCategory } = useReels();
   const { isExpanded } = useSidebar();
   const [showAddReelDialog, setShowAddReelDialog] = useState(false);
+  const [showNotesDialog, setShowNotesDialog] = useState(false);
+  const [categorySort, setCategorySort] = useState("all");
+  const [timeSort, setTimeSort] = useState("recent");
   
   const isEmpty = useMemo(() => {
     return filteredReels.length === 0;
@@ -31,7 +36,11 @@ export default function HomePage() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setShowNotesDialog(true)}
+            >
               <Pencil size={20} />
               <span className="sr-only">Create Note</span>
             </Button>
@@ -57,7 +66,36 @@ export default function HomePage() {
         
         <div className="space-y-4">
           <SearchBar />
-          <CategoryFilter />
+
+          <div className="flex flex-col md:flex-row gap-4 justify-between">
+            <CategoryFilter />
+            
+            <div className="flex gap-2">
+              <Select value={categorySort} onValueChange={setCategorySort}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={timeSort} onValueChange={setTimeSort}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recent</SelectItem>
+                  <SelectItem value="a-z">A-Z</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
           {isEmpty ? (
             <EmptyState 
@@ -92,6 +130,9 @@ export default function HomePage() {
           <SaveReelForm onSuccess={() => setShowAddReelDialog(false)} />
         </DialogContent>
       </Dialog>
+      
+      {/* Dialog for notes */}
+      <NotesDialog open={showNotesDialog} onOpenChange={setShowNotesDialog} />
     </div>
   );
 }
