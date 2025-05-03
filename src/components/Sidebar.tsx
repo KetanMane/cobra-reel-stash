@@ -2,28 +2,30 @@
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { useReels } from "@/hooks/useReels";
-import { ChevronRight, ChevronLeft, Home, Settings, Film, Utensils, Wrench } from "lucide-react";
-import { Category } from "@/lib/types";
+import { ChevronRight, ChevronLeft, Star, Share, Trash2, Settings } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function Sidebar() {
   const { isExpanded, toggleSidebar, collapseSidebar } = useSidebar();
   const { user } = useAuth();
-  const { filterByCategory, activeCategory } = useReels();
-
-  const categories: { id: Category | 'All'; name: string; icon: React.ReactNode }[] = [
-    { id: 'All', name: 'All', icon: <Home size={20} /> },
-    { id: 'Recipes', name: 'Recipes', icon: <Utensils size={20} /> },
-    { id: 'Movies', name: 'Movies', icon: <Film size={20} /> },
-    { id: 'Tools', name: 'Tools', icon: <Wrench size={20} /> },
+  
+  const menuItems = [
+    { id: 'profile', name: 'Profile', icon: <Avatar className="w-6 h-6">
+      {user?.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : 
+      <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>}
+    </Avatar> },
+    { id: 'favorites', name: 'Favorites', icon: <Star size={20} /> },
+    { id: 'shared', name: 'Shared', icon: <Share size={20} /> },
+    { id: 'trash', name: 'Trash', icon: <Trash2 size={20} /> },
   ];
 
   return (
     <>
-      {/* Overlay when sidebar is expanded on mobile */}
+      {/* Overlay when sidebar is expanded */}
       {isExpanded && (
         <div
-          className="fixed inset-0 bg-black/30 z-20 md:hidden"
+          className="fixed inset-0 bg-black/40 z-30 cursor-pointer"
           onClick={collapseSidebar}
         />
       )}
@@ -31,7 +33,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-30 h-screen bg-sidebar transition-all duration-300 ease-in-out border-r border-sidebar-border",
+          "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 ease-in-out border-r border-sidebar-border",
           isExpanded ? "sidebar-expanded" : "sidebar-collapsed"
         )}
       >
@@ -47,8 +49,8 @@ export function Sidebar() {
 
           {/* Logo and user section */}
           <div className="flex flex-col items-center mb-8 p-4">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl mb-2">
-              CS
+            <div className="w-12 h-12 mb-2">
+              <img src="/lovable-uploads/d9d4f479-2706-49ad-9845-6eddeea96620.png" alt="CobraSave" className="w-full h-full" />
             </div>
             {isExpanded && (
               <div className="text-center text-sidebar-foreground">
@@ -59,28 +61,27 @@ export function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-2">
-            <ul className="space-y-1">
-              {categories.map((category) => (
-                <li key={category.id}>
-                  <button
-                    onClick={() => filterByCategory(category.id)}
-                    className={cn(
-                      "flex items-center w-full p-3 rounded-md transition-colors",
-                      activeCategory === category.id
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                    )}
-                  >
-                    <span className="flex-shrink-0">{category.icon}</span>
-                    {isExpanded && (
-                      <span className="ml-3 text-sm">{category.name}</span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <ScrollArea className="flex-1 overflow-hidden">
+            <nav className="px-2 pb-2">
+              <ul className="space-y-1">
+                {menuItems.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      className={cn(
+                        "flex items-center w-full p-3 rounded-md transition-colors",
+                        "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                      )}
+                    >
+                      <span className="flex-shrink-0">{item.icon}</span>
+                      {isExpanded && (
+                        <span className="ml-3 text-sm">{item.name}</span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </ScrollArea>
 
           {/* Bottom section */}
           <div className="p-4">
