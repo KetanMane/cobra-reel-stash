@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { ChevronRight, ChevronLeft, Star, Share2, Trash2, Settings } from "lucide-react";
+import { ChevronRight, ChevronLeft, Home, Star, Share2, Trash2, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +13,7 @@ export function Sidebar() {
   const navigate = useNavigate();
 
   const menuItems = [
+    { id: 'home', name: 'Home', icon: <Home size={20} />, action: () => navigate('/') },
     { id: 'favorites', name: 'Favorites', icon: <Star size={20} />, action: () => navigate('/favorites') },
     { id: 'shared', name: 'Shared', icon: <Share2 size={20} />, action: () => navigate('/shared') },
     { id: 'trash', name: 'Trash', icon: <Trash2 size={20} />, action: () => navigate('/trash') },
