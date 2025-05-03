@@ -21,7 +21,7 @@ export default function HomePage() {
       <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/d9d4f479-2706-49ad-9845-6eddeea96620.png" alt="CobraSave" className="w-8 h-8" />
+            <img src="/lovable-uploads/8913af60-6157-40b0-96fa-458888cc390e.png" alt="CobraSave" className="w-10 h-10" />
             <h1 className="text-2xl font-bold">CobraSave</h1>
           </div>
           <SaveReelForm />

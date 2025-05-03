@@ -4,16 +4,25 @@ import { SavedReel, Category, ReelProcessResponse } from '@/lib/types';
 import { mockReels, mockProcessReel } from '@/lib/mockData';
 import { toast } from '@/hooks/use-toast';
 
+interface TrashedReel extends SavedReel {
+  deletedAt: string;
+  expiresAt: string;
+}
+
 interface ReelsContextType {
   reels: SavedReel[];
   filteredReels: SavedReel[];
   activeCategory: Category | 'All';
   isProcessing: boolean;
+  trashedReels: TrashedReel[];
   saveReel: (reelUrl: string) => Promise<void>;
   filterByCategory: (category: Category | 'All') => void;
   toggleFavorite: (id: string) => void;
   searchReels: (query: string) => void;
   deleteReel: (id: string) => void;
+  restoreFromTrash: (id: string) => void;
+  emptyTrash: () => void;
+  permanentlyDeleteReel: (id: string) => void;
 }
 
 const ReelsContext = createContext<ReelsContextType | undefined>(undefined);
@@ -24,6 +33,7 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
   const [activeCategory, setActiveCategory] = useState<Category | 'All'>('All');
   const [isProcessing, setIsProcessing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [trashedReels, setTrashedReels] = useState<TrashedReel[]>([]);
 
   const applyFilters = useCallback((category: Category | 'All', query: string, reelsList: SavedReel[]) => {
     let result = [...reelsList];
@@ -109,12 +119,64 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteReel = (id: string) => {
-    const updatedReels = reels.filter(reel => reel.id !== id);
-    setReels(updatedReels);
-    setFilteredReels(applyFilters(activeCategory, searchQuery, updatedReels));
+    const reelToTrash = reels.find(reel => reel.id === id);
+    if (reelToTrash) {
+      // Add to trash with expiration date (30 days)
+      const thirtyDaysFromNow = new Date();
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+      
+      const trashedReel: TrashedReel = {
+        ...reelToTrash,
+        deletedAt: new Date().toISOString(),
+        expiresAt: thirtyDaysFromNow.toISOString()
+      };
+      
+      setTrashedReels([...trashedReels, trashedReel]);
+      
+      // Remove from active reels
+      const updatedReels = reels.filter(reel => reel.id !== id);
+      setReels(updatedReels);
+      setFilteredReels(applyFilters(activeCategory, searchQuery, updatedReels));
+      
+      toast({
+        title: "Success",
+        description: "Reel moved to trash",
+      });
+    }
+  };
+  
+  const restoreFromTrash = (id: string) => {
+    const reelToRestore = trashedReels.find(reel => reel.id === id);
+    if (reelToRestore) {
+      // Remove the trash-specific properties and add back to active reels
+      const { deletedAt, expiresAt, ...restoredReel } = reelToRestore;
+      
+      setReels([restoredReel, ...reels]);
+      setFilteredReels(applyFilters(activeCategory, searchQuery, [restoredReel, ...reels]));
+      
+      // Remove from trash
+      setTrashedReels(trashedReels.filter(reel => reel.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Reel restored successfully",
+      });
+    }
+  };
+  
+  const emptyTrash = () => {
+    setTrashedReels([]);
     toast({
       title: "Success",
-      description: "Reel deleted successfully",
+      description: "Trash emptied successfully",
+    });
+  };
+  
+  const permanentlyDeleteReel = (id: string) => {
+    setTrashedReels(trashedReels.filter(reel => reel.id !== id));
+    toast({
+      title: "Success",
+      description: "Reel permanently deleted",
     });
   };
 
@@ -124,11 +186,15 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
       filteredReels,
       activeCategory,
       isProcessing,
+      trashedReels,
       saveReel,
       filterByCategory,
       toggleFavorite,
       searchReels,
-      deleteReel
+      deleteReel,
+      restoreFromTrash,
+      emptyTrash,
+      permanentlyDeleteReel
     }}>
       {children}
     </ReelsContext.Provider>

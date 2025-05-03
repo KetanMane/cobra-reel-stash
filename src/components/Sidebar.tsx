@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/hooks/useSidebar";
 import { useAuth } from "@/hooks/useAuth";
-import { ChevronRight, ChevronLeft, Star, Share, Trash2, Settings } from "lucide-react";
+import { ChevronRight, ChevronLeft, Star, Share2, Trash2, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useNavigate } from "react-router-dom";
@@ -13,10 +13,9 @@ export function Sidebar() {
   const navigate = useNavigate();
 
   const menuItems = [
-    { id: 'favorites', name: 'Favorites', icon: <Star size={20} />, action: () => {} },
-    { id: 'shared', name: 'Shared', icon: <Share size={20} />, action: () => {} },
-    { id: 'trash', name: 'Trash', icon: <Trash2 size={20} />, action: () => {} },
-    { id: 'settings', name: 'Settings', icon: <Settings size={20} />, action: () => navigate('/settings') },
+    { id: 'favorites', name: 'Favorites', icon: <Star size={20} />, action: () => navigate('/favorites') },
+    { id: 'shared', name: 'Shared', icon: <Share2 size={20} />, action: () => navigate('/shared') },
+    { id: 'trash', name: 'Trash', icon: <Trash2 size={20} />, action: () => navigate('/trash') },
   ];
 
   return (
@@ -83,6 +82,22 @@ export function Sidebar() {
               </ul>
             </nav>
           </ScrollArea>
+          
+          {/* Settings at the bottom */}
+          <div className="mt-auto p-2">
+            <button
+              onClick={() => navigate('/settings')}
+              className={cn(
+                "flex items-center w-full p-3 rounded-md transition-colors",
+                "text-sidebar-foreground hover:bg-sidebar-accent/50"
+              )}
+            >
+              <span className="flex-shrink-0"><Settings size={20} /></span>
+              {isExpanded && (
+                <span className="ml-3 text-sm">Settings</span>
+              )}
+            </button>
+          </div>
         </div>
       </aside>
     </>

@@ -8,6 +8,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SettingsPage from "./pages/SettingsPage";
+import FavoritesPage from "./pages/FavoritesPage";
+import SharedPage from "./pages/SharedPage";
+import TrashPage from "./pages/TrashPage";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +23,9 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/shared" element={<SharedPage />} />
+            <Route path="/trash" element={<TrashPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

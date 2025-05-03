@@ -11,8 +11,12 @@ export default function WelcomePage() {
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white font-bold text-2xl mb-6">
-          CS
+        <div className="w-24 h-24 mb-6">
+          <img 
+            src="/lovable-uploads/8913af60-6157-40b0-96fa-458888cc390e.png" 
+            alt="CobraSave Logo" 
+            className="w-full h-full"
+          />
         </div>
         
         <h1 className="text-4xl font-bold mb-3">CobraSave</h1>
