@@ -1,7 +1,6 @@
+
 import { useState } from "react";
-import { SidebarProvider } from "@/hooks/useSidebar";
-import { ReelsProvider, useReels } from "@/hooks/useReels";
-import { Sidebar } from "@/components/Sidebar";
+import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +11,13 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-// Component with trash functionality
-function TrashContent() {
+export default function TrashPage() {
   const { trashedReels, restoreFromTrash, emptyTrash, permanentlyDeleteReel } = useReels();
   const { isExpanded } = useSidebar();
   const [showEmptyTrashDialog, setShowEmptyTrashDialog] = useState(false);
   
   return (
-    <div className="flex-1 ml-16">
+    <div className="min-h-screen flex-1">
       <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -202,19 +200,5 @@ function TrashReelCard({ reel, onRestore, onDelete }: TrashReelCardProps) {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
-}
-
-// Main export wraps the content with providers
-export default function TrashPage() {
-  return (
-    <SidebarProvider>
-      <ReelsProvider>
-        <div className="flex">
-          <Sidebar />
-          <TrashContent />
-        </div>
-      </ReelsProvider>
-    </SidebarProvider>
   );
 }

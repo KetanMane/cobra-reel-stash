@@ -1,20 +1,17 @@
 
-import { SidebarProvider } from "@/hooks/useSidebar";
-import { ReelsProvider, useReels } from "@/hooks/useReels";
-import { Sidebar } from "@/components/Sidebar";
+import { useReels } from "@/hooks/useReels";
+import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
-import { useSidebar } from "@/hooks/useSidebar";
 
-// Separate component that uses the hooks inside the providers
-function FavoritesContent() {
+export default function FavoritesPage() {
   const { reels } = useReels();
   const { isExpanded } = useSidebar();
   
   const favoriteReels = reels.filter(reel => reel.favorite);
   
   return (
-    <div className="flex-1 ml-16">
+    <div className="min-h-screen flex-1">
       <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -25,7 +22,7 @@ function FavoritesContent() {
         
         <div className="space-y-4">
           {favoriteReels.length === 0 ? (
-            <EmptyState type="category" category="Uncategorized" />
+            <EmptyState type="all" category="All" />
           ) : (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {favoriteReels.map((reel) => (
@@ -36,19 +33,5 @@ function FavoritesContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-// Main export wraps the content with providers
-export default function FavoritesPage() {
-  return (
-    <SidebarProvider>
-      <ReelsProvider>
-        <div className="flex">
-          <Sidebar />
-          <FavoritesContent />
-        </div>
-      </ReelsProvider>
-    </SidebarProvider>
   );
 }

@@ -1,13 +1,10 @@
 
-import { SidebarProvider } from "@/hooks/useSidebar";
-import { ReelsProvider, useReels } from "@/hooks/useReels";
-import { Sidebar } from "@/components/Sidebar";
+import { useReels } from "@/hooks/useReels";
+import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
-import { useSidebar } from "@/hooks/useSidebar";
 
-// Separate component that uses the hooks inside the providers
-function SharedContent() {
+export default function SharedPage() {
   const { reels } = useReels();
   const { isExpanded } = useSidebar();
   
@@ -15,7 +12,7 @@ function SharedContent() {
   const sharedReels = reels.slice(0, 2); // Just showing a couple of reels as "shared" for demonstration
   
   return (
-    <div className="flex-1 ml-16">
+    <div className="min-h-screen flex-1">
       <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -37,19 +34,5 @@ function SharedContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-// Main export wraps the content with providers
-export default function SharedPage() {
-  return (
-    <SidebarProvider>
-      <ReelsProvider>
-        <div className="flex">
-          <Sidebar />
-          <SharedContent />
-        </div>
-      </ReelsProvider>
-    </SidebarProvider>
   );
 }

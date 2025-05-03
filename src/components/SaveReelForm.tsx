@@ -5,7 +5,11 @@ import { Input } from '@/components/ui/input';
 import { useReels } from '@/hooks/useReels';
 import { Loader2 } from 'lucide-react';
 
-export function SaveReelForm() {
+interface SaveReelFormProps {
+  onSuccess?: () => void;
+}
+
+export function SaveReelForm({ onSuccess }: SaveReelFormProps) {
   const [reelUrl, setReelUrl] = useState('');
   const { saveReel, isProcessing } = useReels();
 
@@ -13,6 +17,9 @@ export function SaveReelForm() {
     e.preventDefault();
     await saveReel(reelUrl);
     setReelUrl('');
+    if (onSuccess) {
+      onSuccess();
+    }
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -8,26 +7,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [selectedTheme, setSelectedTheme] = useState("default");
   
   return (
     <div className="min-h-screen container py-6">
       <div className="mb-6">
-        <Button 
-          variant="ghost" 
-          className="flex items-center gap-2 mb-4" 
-          onClick={() => navigate('/')}
-        >
-          <ArrowLeft size={16} />
-          Back to Home
-        </Button>
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <div className="flex items-center gap-2">
+          <img src="/lovable-uploads/8913af60-6157-40b0-96fa-458888cc390e.png" alt="CobraSave" className="w-10 h-10" />
+          <h1 className="text-2xl font-bold">Settings</h1>
+        </div>
       </div>
       
       <Tabs defaultValue="account" className="space-y-4">
