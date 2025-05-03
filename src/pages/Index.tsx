@@ -21,8 +21,12 @@ function AuthCheck() {
   return isAuthenticated ? (
     <SidebarProvider>
       <ReelsProvider>
-        <Sidebar />
-        <HomePage />
+        <div className="flex">
+          <Sidebar />
+          <div className="flex-1 ml-16">
+            <HomePage />
+          </div>
+        </div>
       </ReelsProvider>
     </SidebarProvider>
   ) : (

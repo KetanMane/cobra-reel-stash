@@ -6,19 +6,24 @@ import { SaveReelForm } from "@/components/SaveReelForm";
 import { ReelCard } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
 import { useReels } from "@/hooks/useReels";
+import { useSidebar } from "@/hooks/useSidebar";
 
 export default function HomePage() {
   const { filteredReels, activeCategory } = useReels();
+  const { isExpanded } = useSidebar();
   
   const isEmpty = useMemo(() => {
     return filteredReels.length === 0;
   }, [filteredReels]);
 
   return (
-    <div className="min-h-screen">
-      <div className="flex-1 container py-6 space-y-6">
+    <div className="min-h-screen flex-1">
+      <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold">CobraSave</h1>
+          <div className="flex items-center gap-2">
+            <img src="/lovable-uploads/d9d4f479-2706-49ad-9845-6eddeea96620.png" alt="CobraSave" className="w-8 h-8" />
+            <h1 className="text-2xl font-bold">CobraSave</h1>
+          </div>
           <SaveReelForm />
         </div>
         
