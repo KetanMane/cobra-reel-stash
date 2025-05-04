@@ -92,9 +92,9 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
           </div>
         )}
         
-        <div className="p-4">
-          <h3 className="text-base font-medium mb-1">{reel.title}</h3>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{reel.summary}</p>
+        <div className="p-3">
+          <h3 className="text-sm font-medium mb-1 line-clamp-1">{reel.title}</h3>
+          <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{reel.summary}</p>
           
           <div className="flex flex-wrap gap-2 items-center justify-between">
             <span className={cn(
@@ -178,22 +178,22 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
       onMouseLeave={handleTouchEnd}
     >
       {reel.selected && (
-        <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
-          <Check size={14} className="text-white" />
+        <div className="absolute top-1 right-1 bg-primary rounded-full p-1 z-10">
+          <Check size={10} className="text-white" />
         </div>
       )}
       
-      <CardHeader className="pb-1 pt-2 px-2">
-        <CardTitle className="text-xs font-medium line-clamp-1">{reel.title}</CardTitle>
+      <CardHeader className="pb-0 pt-1 px-2">
+        <CardTitle className="text-3xs font-medium line-clamp-1 text-white">{reel.title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-2 pb-0">
-        <p className="text-xs text-muted-foreground line-clamp-2">
+        <p className="text-3xs text-white line-clamp-1">
           {reel.summary}
         </p>
       </CardContent>
-      <CardFooter className="p-0 px-2 pb-2 mt-1 flex justify-between items-center">
+      <CardFooter className="p-0 px-2 pb-1 mt-0 flex justify-between items-center">
         <span className={cn(
-          "text-2xs px-1 py-0.5 rounded-full",
+          "text-3xs px-1 py-0.5 rounded-full",
           reel.category === "Recipes" && "bg-green-900/50 text-green-300",
           reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
           reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
@@ -202,7 +202,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
         )}>
           {reel.category}
         </span>
-        <span className="text-2xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
+        <span className="text-3xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
       </CardFooter>
     </Card>
   );

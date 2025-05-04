@@ -118,23 +118,23 @@ export default function HomePage() {
   const getGridClass = () => {
     switch(viewType) {
       case 'largeGrid':
-        return "grid grid-cols-2 gap-3"; // Changed to 2 cards per row
+        return "grid grid-cols-2 gap-2"; // 2 cards per row, reduced gap for mobile
       case 'list':
-        return "flex flex-col gap-3";
+        return "flex flex-col gap-2"; // Reduced gap for mobile
       case 'smallGrid':
       default:
-        return "grid grid-cols-3 gap-2"; // 3 cards per row
+        return "grid grid-cols-3 gap-1"; // 3 cards per row, minimal gap for mobile
     }
   };
   
   return (
     <div className="min-h-screen flex-1 relative">
-      <div className={`flex-1 container max-w-md mx-auto py-4 px-3 space-y-3 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container max-w-md mx-auto py-3 px-2 space-y-2 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section with consistent layout */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-8 h-8" />
-            <h1 className="text-xl font-bold">Home</h1>
+            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-7 h-7" />
+            <h1 className="text-lg font-bold">Home</h1>
           </div>
           
           {isSelectionMode ? (
@@ -145,7 +145,7 @@ export default function HomePage() {
                 onClick={handleFavoriteSelected}
                 title="Add to favorites"
               >
-                <Star size={18} className="text-yellow-500" />
+                <Star size={16} className="text-yellow-500" />
                 <span className="sr-only">Add to favorites</span>
               </Button>
               
@@ -155,7 +155,7 @@ export default function HomePage() {
                 onClick={handleDeleteSelected}
                 title="Delete selected"
               >
-                <Trash2 size={18} className="text-red-500" />
+                <Trash2 size={16} className="text-red-500" />
                 <span className="sr-only">Delete selected</span>
               </Button>
               
@@ -165,7 +165,7 @@ export default function HomePage() {
                 onClick={handleCancelSelection}
                 title="Cancel selection"
               >
-                <span className="text-sm">Cancel</span>
+                <span className="text-xs">Cancel</span>
               </Button>
             </div>
           ) : (
@@ -176,14 +176,14 @@ export default function HomePage() {
                 onClick={() => setShowNotesDialog(true)}
                 title="Create Note"
               >
-                <Pencil size={18} />
+                <Pencil size={16} />
                 <span className="sr-only">Create Note</span>
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" title="More options">
-                    <MoreVertical size={18} />
+                    <MoreVertical size={16} />
                     <span className="sr-only">More options</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -228,7 +228,7 @@ export default function HomePage() {
         {/* Sorting - smaller and darker */}
         <div className="w-24 max-w-[120px]">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full text-xs text-foreground font-medium h-8 bg-secondary">
+            <SelectTrigger className="w-full text-xs text-foreground font-medium h-7 bg-secondary">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -269,7 +269,7 @@ export default function HomePage() {
               size="icon"
               className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all z-50"
             >
-              <Plus size={20} />
+              <Plus size={18} />
               <span className="sr-only">Add Reel</span>
             </Button>
           </DrawerTrigger>

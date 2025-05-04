@@ -1,8 +1,8 @@
-
 import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { SavedReel, Category, ReelProcessResponse } from '@/lib/types';
 import { mockReels, mockProcessReel } from '@/lib/mockData';
 import { toast } from '@/hooks/use-toast';
+import { processReelWithOpenAI } from '@/lib/openai';
 
 interface TrashedReel extends SavedReel {
   deletedAt: string;
@@ -59,31 +59,15 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
   // Process reel with OpenAI
   const processReelWithAI = async (reelText: string): Promise<ReelProcessResponse> => {
     try {
-      // In a production app, this would be an API call to a backend that handles the OpenAI request
-      // For now, we'll simulate it with a mock
-      
-      // This would be the actual OpenAI implementation once connected to backend
-      /*
-      const response = await fetch('/api/process-reel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reelText }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to process reel with AI');
+      // Use OpenAI processing if API key is available, otherwise use mock
+      try {
+        return await processReelWithOpenAI(reelText);
+      } catch (error) {
+        console.warn("OpenAI processing failed, falling back to mock:", error);
+        // Fallback to mock if OpenAI processing fails
+        const response = await mockProcessReel(reelText);
+        return response;
       }
-      
-      const data = await response.json();
-      return data;
-      */
-      
-      // For now, use the mock function
-      const response = await mockProcessReel(reelText);
-      console.log("AI processed reel:", response);
-      return response;
     } catch (error) {
       console.error("Error processing reel with AI:", error);
       throw error;

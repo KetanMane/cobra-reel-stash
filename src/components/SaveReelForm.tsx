@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { useReels } from '@/hooks/useReels';
 import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Category } from '@/lib/types';
+import { Category, ReelProcessResponse } from '@/lib/types';
+import { toast } from '@/hooks/use-toast';
+import { processReelWithOpenAI } from '@/lib/openai';
 
 interface SaveReelFormProps {
   onSuccess?: () => void;
@@ -19,13 +21,31 @@ export function SaveReelForm({ onSuccess }: SaveReelFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Add category prefix to help categorization
-    const reelTextWithCategory = `${selectedCategory.toLowerCase()}: ${reelUrl}`;
+    if (!reelUrl.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid Reel URL or text",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    await saveReel(reelTextWithCategory);
-    setReelUrl('');
-    if (onSuccess) {
-      onSuccess();
+    try {
+      // Add category prefix to help categorization
+      const reelTextWithCategory = `${selectedCategory.toLowerCase()}: ${reelUrl}`;
+      
+      await saveReel(reelTextWithCategory);
+      setReelUrl('');
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error("Error saving reel:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process reel. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -62,6 +82,11 @@ export function SaveReelForm({ onSuccess }: SaveReelFormProps) {
             <SelectItem value="Movies">Movies</SelectItem>
             <SelectItem value="Tools">Tools</SelectItem>
             <SelectItem value="Notes">Notes</SelectItem>
+            <SelectItem value="Anime">Anime</SelectItem>
+            <SelectItem value="LifeHacks">Life Hacks</SelectItem>
+            <SelectItem value="Books">Books</SelectItem>
+            <SelectItem value="Fitness">Fitness</SelectItem>
+            <SelectItem value="Tech">Tech</SelectItem>
             <SelectItem value="Uncategorized">Uncategorized</SelectItem>
           </SelectContent>
         </Select>

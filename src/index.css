@@ -81,4 +81,10 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+  
+  /* Font sizing for mobile cards */
+  .text-3xs {
+    font-size: 0.65rem;
+    line-height: 1rem;
+  }
 }
