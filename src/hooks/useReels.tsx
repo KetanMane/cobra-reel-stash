@@ -23,6 +23,7 @@ interface ReelsContextType {
   restoreFromTrash: (id: string) => void;
   emptyTrash: () => void;
   permanentlyDeleteReel: (id: string) => void;
+  updateReel: (id: string, updates: Partial<SavedReel>) => void;
 }
 
 const ReelsContext = createContext<ReelsContextType | undefined>(undefined);
@@ -55,6 +56,40 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
     return result;
   }, []);
 
+  // Process reel with OpenAI
+  const processReelWithAI = async (reelText: string): Promise<ReelProcessResponse> => {
+    try {
+      // In a production app, this would be an API call to a backend that handles the OpenAI request
+      // For now, we'll simulate it with a mock
+      
+      // This would be the actual OpenAI implementation once connected to backend
+      /*
+      const response = await fetch('/api/process-reel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reelText }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to process reel with AI');
+      }
+      
+      const data = await response.json();
+      return data;
+      */
+      
+      // For now, use the mock function
+      const response = await mockProcessReel(reelText);
+      console.log("AI processed reel:", response);
+      return response;
+    } catch (error) {
+      console.error("Error processing reel with AI:", error);
+      throw error;
+    }
+  };
+
   const saveReel = async (reelText: string) => {
     if (!reelText.trim()) {
       toast({
@@ -68,8 +103,11 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
     setIsProcessing(true);
     
     try {
-      // This will be replaced with actual API call
-      const response: ReelProcessResponse = await mockProcessReel(reelText);
+      // Process with AI (or mock for now)
+      const response: ReelProcessResponse = await processReelWithAI(reelText);
+      
+      // Add source URL from the reelText if it looks like a URL
+      const isUrl = reelText.startsWith('http') || reelText.startsWith('www.');
       
       const newReel: SavedReel = {
         id: Date.now().toString(),
@@ -78,6 +116,7 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
         category: response.category,
         timestamp: new Date().toISOString().split('T')[0],
         favorite: false,
+        sourceUrl: isUrl ? reelText : undefined,
       };
       
       const updatedReels = [newReel, ...reels];
@@ -137,11 +176,6 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
       const updatedReels = reels.filter(reel => reel.id !== id);
       setReels(updatedReels);
       setFilteredReels(applyFilters(activeCategory, searchQuery, updatedReels));
-      
-      toast({
-        title: "Success",
-        description: "Reel moved to trash",
-      });
     }
   };
   
@@ -180,6 +214,15 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // Update a reel
+  const updateReel = (id: string, updates: Partial<SavedReel>) => {
+    const updatedReels = reels.map(reel => 
+      reel.id === id ? { ...reel, ...updates } : reel
+    );
+    setReels(updatedReels);
+    setFilteredReels(applyFilters(activeCategory, searchQuery, updatedReels));
+  };
+
   return (
     <ReelsContext.Provider value={{
       reels,
@@ -194,7 +237,8 @@ export function ReelsProvider({ children }: { children: ReactNode }) {
       deleteReel,
       restoreFromTrash,
       emptyTrash,
-      permanentlyDeleteReel
+      permanentlyDeleteReel,
+      updateReel
     }}>
       {children}
     </ReelsContext.Provider>

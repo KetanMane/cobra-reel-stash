@@ -53,7 +53,7 @@ export const mockUser = {
 
 export const mockProcessReel = (reelText: string): Promise<{
   summary: string;
-  category: 'Recipes' | 'Movies' | 'Tools' | 'Uncategorized';
+  category: 'Recipes' | 'Movies' | 'Tools' | 'Notes' | 'Uncategorized';
   title: string;
 }> => {
   return new Promise((resolve) => {
@@ -82,6 +82,14 @@ export const mockProcessReel = (reelText: string): Promise<{
           summary: 'A summary of the tool or hack shown in the reel.',
           category: 'Tools',
           title: 'Useful Life Hack',
+        });
+      } else if (reelText.toLowerCase().includes('note') || 
+                reelText.toLowerCase().includes('remember') || 
+                reelText.toLowerCase().includes('idea')) {
+        resolve({
+          summary: 'A note to remember important information or ideas.',
+          category: 'Notes',
+          title: 'Important Note',
         });
       } else {
         resolve({

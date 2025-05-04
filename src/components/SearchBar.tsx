@@ -23,7 +23,7 @@ export function SearchBar() {
         placeholder="Search saved reels..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="pl-10"
+        className="pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-9"
       />
     </div>
   );

@@ -18,8 +18,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const { login } = useAuth();
+  const { login, loginWithMock } = useAuth();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -33,26 +32,24 @@ export function LoginForm() {
     setIsLoggingIn(true);
     
     try {
-      // This will be replaced with actual Supabase auth
-      await login();
+      await login(values.email, values.password);
+    } catch (error) {
+      console.error("Login error:", error);
     } finally {
       setIsLoggingIn(false);
+    }
+  };
+  
+  const handleDemoLogin = async () => {
+    try {
+      await loginWithMock();
+    } catch (error) {
+      console.error("Demo login error:", error);
     }
   };
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold tracking-tight">
-          {isLogin ? 'Welcome back' : 'Create an account'}
-        </h2>
-        <p className="text-sm text-muted-foreground mt-2">
-          {isLogin 
-            ? 'Enter your credentials to access your account' 
-            : 'Enter your information to create an account'}
-        </p>
-      </div>
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -66,6 +63,7 @@ export function LoginForm() {
                     placeholder="you@example.com" 
                     type="email" 
                     autoComplete="email"
+                    className="transition-all duration-300 focus:ring-2 focus:ring-primary/50"
                     {...field}
                   />
                 </FormControl>
@@ -83,7 +81,8 @@ export function LoginForm() {
                   <Input 
                     placeholder="••••••••" 
                     type="password"
-                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    autoComplete="current-password"
+                    className="transition-all duration-300 focus:ring-2 focus:ring-primary/50"
                     {...field}
                   />
                 </FormControl>
@@ -93,11 +92,11 @@ export function LoginForm() {
 
           <Button 
             type="submit" 
-            className="w-full mt-6" 
+            className="w-full mt-6 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" 
             disabled={isLoggingIn}
           >
             {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLogin ? 'Sign in' : 'Create account'}
+            Sign in
           </Button>
         </form>
       </Form>
@@ -112,20 +111,33 @@ export function LoginForm() {
           </span>
         </div>
       </div>
-
-      <Button variant="outline" className="w-full">
-        Continue with Demo Account
-      </Button>
-
-      <div className="text-center mt-6">
-        <Button
-          variant="link"
-          onClick={() => setIsLogin(!isLogin)}
-          className="text-primary"
-        >
-          {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+      
+      {/* Social login options */}
+      <div className="flex gap-3 justify-center mb-4">
+        <Button variant="outline" size="icon" className="rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10">
+          <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" className="w-5 h-5" />
+        </Button>
+        <Button variant="outline" size="icon" className="rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10">
+          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" className="w-5 h-5" />
+        </Button>
+        <Button variant="outline" size="icon" className="rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10">
+          <img src="https://cdn-icons-png.flaticon.com/512/3670/3670147.png" alt="TikTok" className="w-5 h-5" />
+        </Button>
+        <Button variant="outline" size="icon" className="rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10">
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" className="w-5 h-5" />
+        </Button>
+        <Button variant="outline" size="icon" className="rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10">
+          <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" className="w-5 h-5" />
         </Button>
       </div>
+
+      <Button 
+        variant="outline" 
+        className="w-full transition-all duration-300 hover:bg-secondary/80"
+        onClick={handleDemoLogin}
+      >
+        Continue with Demo Account
+      </Button>
     </div>
   );
 }

@@ -4,67 +4,286 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReels } from "@/hooks/useReels";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Check, ExternalLink, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
+import { ViewType } from "@/hooks/useViewType";
+
+// Function to format dates in a more readable manner (e.g., "12 Apr 23")
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear().toString().substr(-2);
+    return `${day} ${month} ${year}`;
+  } catch (e) {
+    return dateString;
+  }
+};
 
 interface ReelCardProps {
   reel: SavedReel;
+  isSelectionMode: boolean;
+  onSelect: (id: string) => void;
+  onOpenReel: (reel: SavedReel) => void;
+  viewType: ViewType;
 }
 
-export function ReelCard({ reel }: ReelCardProps) {
-  const { toggleFavorite, deleteReel } = useReels();
+export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType }: ReelCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  // Handle long press
+  const handleTouchStart = () => {
+    const timer = setTimeout(() => {
+      onSelect(reel.id);
+    }, 500); // 500ms for long press
+    setLongPressTimer(timer);
+  };
+  
+  const handleTouchEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+  
+  // Clean up timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (longPressTimer) clearTimeout(longPressTimer);
+    };
+  }, [longPressTimer]);
 
-  return (
-    <Card className={cn("card-transition", expanded ? "border-primary" : "")}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-medium">{reel.title}</CardTitle>
-          <button
-            onClick={() => toggleFavorite(reel.id)}
-            className="text-yellow-500 hover:text-yellow-400 focus:outline-none"
-            aria-label={reel.favorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            {reel.favorite ? "⭐" : "☆"}
-          </button>
+  // Handle regular tap/click
+  const handleClick = () => {
+    if (isSelectionMode) {
+      onSelect(reel.id);
+    } else {
+      onOpenReel(reel);
+    }
+  };
+
+  // List view
+  if (viewType === 'list') {
+    return (
+      <Card 
+        className={cn(
+          "card-transition relative overflow-hidden border",
+          reel.selected ? "border-primary border-2" : "",
+          "hover:border-primary/50"
+        )}
+        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleTouchStart}
+        onMouseUp={handleTouchEnd}
+        onMouseLeave={handleTouchEnd}
+      >
+        {reel.selected && (
+          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
+            <Check size={14} className="text-white" />
+          </div>
+        )}
+        
+        <div className="p-4">
+          <h3 className="text-base font-medium mb-1">{reel.title}</h3>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{reel.summary}</p>
+          
+          <div className="flex flex-wrap gap-2 items-center justify-between">
+            <span className={cn(
+              "text-xs px-2 py-0.5 rounded-full",
+              reel.category === "Recipes" && "bg-green-900/50 text-green-300",
+              reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
+              reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
+              reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
+              reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
+            )}>
+              {reel.category}
+            </span>
+            <span className="text-xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
+          </div>
         </div>
-        <div className="flex gap-2 items-center mt-1">
+      </Card>
+    );
+  }
+
+  // Large grid view - 2 cards per row
+  if (viewType === 'largeGrid') {
+    return (
+      <Card 
+        className={cn(
+          "card-transition relative overflow-hidden border h-full",
+          reel.selected ? "border-primary border-2" : "",
+          "hover:border-primary/50"
+        )}
+        onClick={handleClick}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleTouchStart}
+        onMouseUp={handleTouchEnd}
+        onMouseLeave={handleTouchEnd}
+      >
+        {reel.selected && (
+          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
+            <Check size={14} className="text-white" />
+          </div>
+        )}
+        
+        <CardHeader className="pb-1 pt-3 px-3">
+          <CardTitle className="text-sm font-medium line-clamp-1">{reel.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0 px-3 pb-0">
+          <p className="text-xs text-muted-foreground line-clamp-3">
+            {reel.summary}
+          </p>
+        </CardContent>
+        <CardFooter className="p-0 px-3 pb-2 mt-1 flex justify-between">
           <span className={cn(
             "text-xs px-2 py-0.5 rounded-full",
             reel.category === "Recipes" && "bg-green-900/50 text-green-300",
             reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
             reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
+            reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
             reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
           )}>
             {reel.category}
           </span>
-          <span className="text-xs text-muted-foreground">{reel.timestamp}</span>
+          <span className="text-xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
+        </CardFooter>
+      </Card>
+    );
+  }
+
+  // Default small grid view - 3 cards per row, more compact
+  return (
+    <Card 
+      className={cn(
+        "card-transition relative overflow-hidden border h-full",
+        expanded ? "border-primary" : "",
+        reel.selected ? "border-primary border-2" : "",
+        "hover:border-primary/50"
+      )}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleTouchStart}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchEnd}
+    >
+      {reel.selected && (
+        <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
+          <Check size={14} className="text-white" />
         </div>
+      )}
+      
+      <CardHeader className="pb-1 pt-2 px-2">
+        <CardTitle className="text-xs font-medium line-clamp-1">{reel.title}</CardTitle>
       </CardHeader>
-      <CardContent className="pt-0">
-        <p className={cn(
-          "text-sm text-muted-foreground",
-          !expanded && "line-clamp-2"
-        )}>
+      <CardContent className="pt-0 px-2 pb-0">
+        <p className="text-xs text-muted-foreground line-clamp-2">
           {reel.summary}
         </p>
       </CardContent>
-      <CardFooter className="flex justify-between pt-0">
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "Show Less" : "Show More"}
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => deleteReel(reel.id)}
-          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-        >
-          Delete
-        </Button>
+      <CardFooter className="p-0 px-2 pb-2 mt-1 flex justify-between items-center">
+        <span className={cn(
+          "text-2xs px-1 py-0.5 rounded-full",
+          reel.category === "Recipes" && "bg-green-900/50 text-green-300",
+          reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
+          reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
+          reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
+          reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
+        )}>
+          {reel.category}
+        </span>
+        <span className="text-2xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
       </CardFooter>
     </Card>
+  );
+}
+
+// Component for the edit dialog when a reel is tapped
+export function ReelEditDialog({ 
+  reel, 
+  isOpen, 
+  onClose,
+  onSave 
+}: { 
+  reel: SavedReel | null; 
+  isOpen: boolean; 
+  onClose: () => void;
+  onSave: (id: string, title: string, summary: string) => void;
+}) {
+  const [editedTitle, setEditedTitle] = useState("");
+  const [editedSummary, setEditedSummary] = useState("");
+  
+  // Set initial values when dialog opens
+  useEffect(() => {
+    if (reel) {
+      setEditedTitle(reel.title);
+      setEditedSummary(reel.summary);
+    }
+  }, [reel]);
+  
+  const handleSave = () => {
+    if (reel) {
+      onSave(reel.id, editedTitle, editedSummary);
+      onClose();
+    }
+  };
+  
+  const handleOpenSource = () => {
+    if (reel?.sourceUrl) {
+      window.open(reel.sourceUrl, '_blank');
+    } else {
+      toast({
+        title: "Source not available",
+        description: "The source URL for this reel is not available.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader className="flex flex-row items-center justify-between">
+          <DialogTitle>Edit Reel</DialogTitle>
+          <Button variant="outline" size="sm" onClick={handleOpenSource} className="flex gap-1">
+            <ExternalLink size={14} />
+            <span>Open Source</span>
+          </Button>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Input
+              placeholder="Reel Title"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Textarea
+              placeholder="Reel Summary"
+              className="min-h-[200px]"
+              value={editedSummary}
+              onChange={(e) => setEditedSummary(e.target.value)}
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>Save Changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

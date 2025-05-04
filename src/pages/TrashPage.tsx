@@ -1,204 +1,149 @@
 
-import { useState } from "react";
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MoreVertical, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { ReelCard } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
+import { Separator } from "@/components/ui/separator";
+import { MoreVertical, Trash2, RefreshCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import { toast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useViewType } from "@/hooks/useViewType";
 
 export default function TrashPage() {
   const { trashedReels, restoreFromTrash, emptyTrash, permanentlyDeleteReel } = useReels();
   const { isExpanded } = useSidebar();
+  const { viewType } = useViewType();
   const [showEmptyTrashDialog, setShowEmptyTrashDialog] = useState(false);
   
+  // Helper function to format date
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear().toString().substr(-2);
+      return `${day} ${month} ${year}`;
+    } catch (e) {
+      return dateString;
+    }
+  };
+  
+  // Get grid class based on view type
+  const getGridClass = () => {
+    switch(viewType) {
+      case 'largeGrid':
+        return "grid grid-cols-2 gap-3"; // 2 cards per row
+      case 'list':
+        return "flex flex-col gap-3"; // List view
+      case 'smallGrid':
+      default:
+        return "grid grid-cols-3 gap-2"; // 3 cards per row
+    }
+  };
+
   return (
     <div className="min-h-screen flex-1">
-      <div className={`flex-1 container py-6 space-y-6 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container max-w-md mx-auto py-4 px-3 space-y-4 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+        {/* Header section */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/8913af60-6157-40b0-96fa-458888cc390e.png" alt="CobraSave" className="w-10 h-10" />
-            <h1 className="text-2xl font-bold">Trash</h1>
+            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-8 h-8" />
+            <h1 className="text-xl font-bold">Trash</h1>
           </div>
-          {trashedReels.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical size={20} />
-                  <span className="sr-only">More options</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setShowEmptyTrashDialog(true)}>
-                  Empty trash
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" title="More options">
+                <MoreVertical size={18} />
+                <span className="sr-only">More options</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowEmptyTrashDialog(true)}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Empty Trash</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        
-        {trashedReels.length > 0 && (
-          <p className="text-sm text-muted-foreground">
-            Items in trash will be automatically deleted after 30 days.
-          </p>
-        )}
+
+        <div className="flex justify-center">
+          <Separator className="w-full bg-primary/40" />
+        </div>
         
         <div className="space-y-4">
           {trashedReels.length === 0 ? (
-            <EmptyState type="all" category="All" />
+            <EmptyState type="trash" />
           ) : (
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className={getGridClass()}>
               {trashedReels.map((reel) => (
-                <TrashReelCard 
-                  key={reel.id} 
-                  reel={reel} 
-                  onRestore={() => restoreFromTrash(reel.id)} 
-                  onDelete={() => permanentlyDeleteReel(reel.id)} 
-                />
+                <div key={reel.id} className="relative">
+                  <ReelCard 
+                    reel={{...reel, selected: false}}
+                    isSelectionMode={false}
+                    onSelect={() => {}}
+                    onOpenReel={() => {}}
+                    viewType={viewType}
+                  />
+                  <div className="absolute top-0 right-0 p-2 flex gap-1">
+                    <Button
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 bg-secondary/50 hover:bg-secondary"
+                      onClick={() => restoreFromTrash(reel.id)}
+                      title="Restore reel"
+                    >
+                      <RefreshCcw size={12} />
+                      <span className="sr-only">Restore</span>
+                    </Button>
+                    <Button
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 bg-secondary/50 hover:bg-secondary"
+                      onClick={() => permanentlyDeleteReel(reel.id)}
+                      title="Delete permanently"
+                    >
+                      <Trash2 size={12} />
+                      <span className="sr-only">Delete</span>
+                    </Button>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-black/50 text-xs text-white text-center">
+                    Expires: {formatDate(reel.expiresAt)}
+                  </div>
+                </div>
               ))}
             </div>
           )}
         </div>
       </div>
       
+      {/* Empty Trash Dialog */}
       <AlertDialog open={showEmptyTrashDialog} onOpenChange={setShowEmptyTrashDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Empty trash?</AlertDialogTitle>
+            <AlertDialogTitle>Empty Trash</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete all items in the trash. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              emptyTrash();
-              setShowEmptyTrashDialog(false);
-            }} className="bg-destructive text-destructive-foreground">
-              Empty trash
+            <AlertDialogAction 
+              onClick={() => {
+                emptyTrash();
+                setShowEmptyTrashDialog(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Empty Trash
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
-}
-
-interface TrashReelCardProps {
-  reel: {
-    id: string;
-    title: string;
-    summary: string;
-    category: string;
-    timestamp: string;
-    favorite: boolean;
-    deletedAt: string;
-    expiresAt: string;
-  };
-  onRestore: () => void;
-  onDelete: () => void;
-}
-
-function TrashReelCard({ reel, onRestore, onDelete }: TrashReelCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
-  const daysLeft = Math.ceil(
-    (new Date(reel.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-  );
-
-  return (
-    <>
-      <Card className={cn("card-transition", expanded ? "border-primary" : "")}>
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <CardTitle className="text-lg font-medium">{reel.title}</CardTitle>
-            <div className="flex space-x-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onRestore}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-              >
-                <RefreshCw size={16} />
-                <span className="sr-only">Restore</span>
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreVertical size={16} />
-                    <span className="sr-only">More options</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setShowDeleteDialog(true)}>
-                    Delete permanently
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-          <div className="flex gap-2 items-center mt-1">
-            <span className={cn(
-              "text-xs px-2 py-0.5 rounded-full",
-              reel.category === "Recipes" && "bg-green-900/50 text-green-300",
-              reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
-              reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
-              reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
-            )}>
-              {reel.category}
-            </span>
-            <span className="text-xs text-muted-foreground">Deleted {new Date(reel.deletedAt).toLocaleDateString()}</span>
-          </div>
-          <div className="mt-1">
-            <span className="text-xs text-amber-500">Expires in {daysLeft} days</span>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <p className={cn(
-            "text-sm text-muted-foreground",
-            !expanded && "line-clamp-2"
-          )}>
-            {reel.summary}
-          </p>
-        </CardContent>
-        <CardFooter className="pt-0">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? "Show Less" : "Show More"}
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete permanently?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this reel. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                onDelete();
-                setShowDeleteDialog(false);
-              }} 
-              className="bg-destructive text-destructive-foreground"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
   );
 }
