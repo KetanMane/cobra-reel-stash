@@ -75,6 +75,14 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleFavorite(reel.id);
+    
+    // Show toast animation
+    if (!reel.favorite) {
+      toast({
+        title: "Added to favorites",
+        description: "Reel has been added to your favorites",
+      });
+    }
   };
 
   // List view
@@ -82,9 +90,9 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
     return (
       <Card 
         className={cn(
-          "card-transition relative overflow-hidden border",
+          "card-transition relative overflow-hidden border animate-fade-in",
           reel.selected ? "border-primary border-2" : "",
-          "hover:border-primary/50"
+          "hover:border-primary/50 hover:scale-[1.02]"
         )}
         onClick={handleClick}
         onTouchStart={handleTouchStart}
@@ -95,12 +103,21 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
       >
         {reel.favorite && (
           <div className="favorite-star" onClick={handleToggleFavorite}>
-            <Star size={16} fill="#FFD700" />
+            <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
+          </div>
+        )}
+        
+        {!reel.favorite && (
+          <div 
+            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
+            onClick={handleToggleFavorite}
+          >
+            <Star size={16} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
           </div>
         )}
         
         {reel.selected && (
-          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
+          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
             <Check size={14} className="text-white" />
           </div>
         )}
@@ -127,67 +144,13 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
     );
   }
 
-  // Large grid view - 2 cards per row
-  if (viewType === 'largeGrid') {
-    return (
-      <Card 
-        className={cn(
-          "card-transition relative overflow-hidden border h-full",
-          reel.selected ? "border-primary border-2" : "",
-          "hover:border-primary/50"
-        )}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onMouseDown={handleTouchStart}
-        onMouseUp={handleTouchEnd}
-        onMouseLeave={handleTouchEnd}
-      >
-        {reel.favorite && (
-          <div className="favorite-star" onClick={handleToggleFavorite}>
-            <Star size={14} fill="#FFD700" />
-          </div>
-        )}
-        
-        {reel.selected && (
-          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10">
-            <Check size={14} className="text-white" />
-          </div>
-        )}
-        
-        <CardHeader className="pb-1 pt-3 px-3">
-          <CardTitle className="text-sm font-medium line-clamp-1">{reel.title}</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 px-3 pb-0">
-          <p className="text-xs text-muted-foreground line-clamp-3">
-            {reel.summary}
-          </p>
-        </CardContent>
-        <CardFooter className="p-0 px-3 pb-2 mt-1 flex justify-between">
-          <span className={cn(
-            "text-xs px-2 py-0.5 rounded-full",
-            reel.category === "Recipes" && "bg-green-900/50 text-green-300",
-            reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
-            reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
-            reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-            reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
-          )}>
-            {reel.category}
-          </span>
-          <span className="text-xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
-        </CardFooter>
-      </Card>
-    );
-  }
-
-  // Default small grid view - 3 cards per row, more compact
+  // Grid view (2 per row)
   return (
     <Card 
       className={cn(
-        "card-transition relative overflow-hidden border h-full",
-        expanded ? "border-primary" : "",
+        "card-transition relative overflow-hidden border h-full animate-fade-in group",
         reel.selected ? "border-primary border-2" : "",
-        "hover:border-primary/50"
+        "hover:border-primary/50 hover:scale-[1.02]"
       )}
       onClick={handleClick}
       onTouchStart={handleTouchStart}
@@ -198,27 +161,36 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
     >
       {reel.favorite && (
         <div className="favorite-star" onClick={handleToggleFavorite}>
-          <Star size={10} fill="#FFD700" />
+          <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
+        </div>
+      )}
+      
+      {!reel.favorite && (
+        <div 
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
+          onClick={handleToggleFavorite}
+        >
+          <Star size={14} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
         </div>
       )}
       
       {reel.selected && (
-        <div className="absolute top-1 right-1 bg-primary rounded-full p-1 z-10">
-          <Check size={10} className="text-white" />
+        <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
+          <Check size={14} className="text-white" />
         </div>
       )}
       
-      <CardHeader className="pb-0 pt-1 px-2">
-        <CardTitle className="small-grid-text font-medium">{reel.title}</CardTitle>
+      <CardHeader className="pb-1 pt-2 px-3">
+        <CardTitle className="text-sm font-medium line-clamp-1">{reel.title}</CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 px-2 pb-0">
-        <p className="small-grid-text text-white/80">
+      <CardContent className="pt-0 px-3 pb-0">
+        <p className="text-xs text-muted-foreground line-clamp-2">
           {reel.summary}
         </p>
       </CardContent>
-      <CardFooter className="p-0 px-2 pb-1 mt-0 flex justify-between items-center">
+      <CardFooter className="p-0 px-3 pb-2 mt-1 flex justify-between">
         <span className={cn(
-          "category-label",
+          "text-xs px-1.5 py-0.5 rounded-full",
           reel.category === "Recipes" && "bg-green-900/50 text-green-300",
           reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
           reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
@@ -227,7 +199,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
         )}>
           {reel.category}
         </span>
-        <span className="category-label text-muted-foreground">{formatDate(reel.timestamp)}</span>
+        <span className="text-xs text-muted-foreground">{formatDate(reel.timestamp)}</span>
       </CardFooter>
     </Card>
   );
@@ -282,7 +254,7 @@ export function ReelEditDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle>Edit Reel</DialogTitle>
-          <Button variant="outline" size="sm" onClick={handleOpenSource} className="flex gap-1">
+          <Button variant="outline" size="sm" onClick={handleOpenSource} className="flex gap-1 transition-all hover:scale-105">
             <ExternalLink size={14} />
             <span>Open Source</span>
           </Button>
@@ -305,10 +277,10 @@ export function ReelEditDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="transition-all hover:scale-105">
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
+          <Button onClick={handleSave} className="transition-all hover:scale-105">Save Changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

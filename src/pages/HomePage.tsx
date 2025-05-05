@@ -1,9 +1,10 @@
+
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard, ReelEditDialog } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
 import { Separator } from "@/components/ui/separator";
-import { Grid2x2, LayoutList, LayoutGrid, MoreVertical, Pencil, Plus, PinIcon, Star, Trash2 } from "lucide-react";
+import { LayoutList, LayoutGrid, MoreVertical, Pencil, Plus, PinIcon, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NotesDialog } from "@/components/NotesDialog";
@@ -126,13 +127,11 @@ export default function HomePage() {
   // Get grid class based on view type for responsive displays
   const getGridClass = () => {
     switch(viewType) {
-      case 'largeGrid':
-        return "grid grid-cols-1 md:grid-cols-2 gap-2"; // 1 column on mobile, 2 on larger screens
       case 'list':
-        return "flex flex-col gap-2"; 
-      case 'smallGrid':
+        return "flex flex-col gap-2 animate-fade-in"; 
+      case 'grid':
       default:
-        return "grid grid-cols-2 md:grid-cols-3 gap-1"; // 2 columns on mobile, 3 on larger screens
+        return "grid grid-cols-2 gap-2 animate-fade-in"; // Updated to 2 columns by default
     }
   };
   
@@ -140,7 +139,7 @@ export default function HomePage() {
     <div className="min-h-screen flex-1 relative">
       <div className={`flex-1 container px-2 py-3 space-y-2 transition-all duration-300 content-container ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section with consistent layout */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-7 h-7" />
             <h1 className="text-lg font-bold">Home</h1>
@@ -153,6 +152,7 @@ export default function HomePage() {
                 size="icon"
                 onClick={handleFavoriteSelected}
                 title="Add to favorites"
+                className="transition-all hover:scale-105"
               >
                 <Star size={16} className="text-yellow-500" />
                 <span className="sr-only">Add to favorites</span>
@@ -163,6 +163,7 @@ export default function HomePage() {
                 size="icon"
                 onClick={handleDeleteSelected}
                 title="Delete selected"
+                className="transition-all hover:scale-105"
               >
                 <Trash2 size={16} className="text-red-500" />
                 <span className="sr-only">Delete selected</span>
@@ -173,6 +174,7 @@ export default function HomePage() {
                 size="icon"
                 onClick={handleCancelSelection}
                 title="Cancel selection"
+                className="transition-all hover:scale-105"
               >
                 <span className="text-xs">Cancel</span>
               </Button>
@@ -184,6 +186,7 @@ export default function HomePage() {
                 size="icon" 
                 onClick={() => setShowNotesDialog(true)}
                 title="Create Note"
+                className="transition-all hover:scale-105"
               >
                 <Pencil size={16} />
                 <span className="sr-only">Create Note</span>
@@ -191,7 +194,7 @@ export default function HomePage() {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" title="More options">
+                  <Button variant="ghost" size="icon" title="More options" className="transition-all hover:scale-105">
                     <MoreVertical size={16} />
                     <span className="sr-only">More options</span>
                   </Button>
@@ -199,13 +202,9 @@ export default function HomePage() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuGroup>
                     <DropdownMenuLabel>View</DropdownMenuLabel>
-                    <DropdownMenuItem onClick={() => setViewType('smallGrid')}>
-                      <Grid2x2 className="mr-2 h-4 w-4" />
-                      <span>Small Grid (3 per row)</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setViewType('largeGrid')}>
+                    <DropdownMenuItem onClick={() => setViewType('grid')}>
                       <LayoutGrid className="mr-2 h-4 w-4" />
-                      <span>Large Grid (2 per row)</span>
+                      <span>Grid (2 per row)</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setViewType('list')}>
                       <LayoutList className="mr-2 h-4 w-4" />
@@ -220,7 +219,7 @@ export default function HomePage() {
                     </div>
                     <Switch checked={pinFavorites} />
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsSelectionMode(!isSelectionMode)} className="transition-all">
                     Batch Select
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -234,12 +233,12 @@ export default function HomePage() {
         </div>
         
         {/* Search bar */}
-        <div className="w-full">
+        <div className="w-full animate-fade-in">
           <SearchBar />
         </div>
         
         {/* Sorting - smaller and darker */}
-        <div className="w-24 max-w-[120px]">
+        <div className="w-24 max-w-[120px] animate-fade-in">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full text-xs text-foreground font-medium h-7 bg-secondary">
               <SelectValue placeholder="Sort by" />
@@ -252,7 +251,9 @@ export default function HomePage() {
         </div>
         
         {/* Category filtering - more compact */}
-        <CategoryFilter />
+        <div className="animate-fade-in">
+          <CategoryFilter />
+        </div>
         
         <div className="space-y-2">
           {filteredReels.length === 0 ? (
@@ -280,7 +281,7 @@ export default function HomePage() {
           <DrawerTrigger asChild>
             <Button
               size="icon"
-              className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all z-50"
+              className="fixed bottom-6 right-6 h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-all z-50 hover:scale-105 animate-fade-in"
             >
               <Plus size={18} />
               <span className="sr-only">Add Reel</span>
@@ -301,7 +302,7 @@ export default function HomePage() {
       ) : (
         <Button
           size="icon"
-          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-50"
+          className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all z-50 hover:scale-105 animate-fade-in"
           onClick={() => setShowSaveReelDialog(true)}
         >
           <Plus size={24} />

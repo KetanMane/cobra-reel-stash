@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-export type ViewType = 'smallGrid' | 'largeGrid' | 'list';
+export type ViewType = 'grid' | 'list';
 
 interface ViewTypeContextType {
   viewType: ViewType;
@@ -11,10 +11,14 @@ interface ViewTypeContextType {
 const ViewTypeContext = createContext<ViewTypeContextType | undefined>(undefined);
 
 export function ViewTypeProvider({ children }: { children: ReactNode }) {
-  // Initialize from localStorage if available, otherwise use smallGrid
+  // Initialize from localStorage if available, otherwise use grid
   const [viewType, setViewType] = useState<ViewType>(() => {
     const savedViewType = localStorage.getItem('cobra-view-type');
-    return (savedViewType as ViewType) || 'smallGrid';
+    // Convert old values to new values
+    if (savedViewType === 'smallGrid' || savedViewType === 'largeGrid') {
+      return 'grid';
+    }
+    return (savedViewType as ViewType) || 'grid';
   });
 
   // Save to localStorage whenever viewType changes
