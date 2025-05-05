@@ -62,9 +62,9 @@ export default function Index() {
     <SidebarProvider>
       <ReelsProvider>
         <ViewTypeProvider>
-          <div className="flex">
+          <div className="flex h-screen overflow-hidden">
             <Sidebar />
-            <div className="flex-1 ml-16">
+            <div className="flex-1 ml-16 overflow-auto">
               {renderAuthenticatedPage()}
             </div>
           </div>

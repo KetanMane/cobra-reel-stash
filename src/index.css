@@ -52,7 +52,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased overflow-hidden;
   }
 
   .sidebar-collapsed {
@@ -72,19 +72,58 @@
   }
   
   /* Hide scrollbar for Chrome, Safari and Opera */
-  .overflow-hidden::-webkit-scrollbar {
+  .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
 
   /* Hide scrollbar for IE, Edge and Firefox */
-  .overflow-hidden {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
   
   /* Font sizing for mobile cards */
   .text-3xs {
     font-size: 0.65rem;
     line-height: 1rem;
+  }
+  
+  /* Text styling for small grid reels */
+  .small-grid-text {
+    font-size: 0.6rem;
+    line-height: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+  
+  /* Text styling for category labels */
+  .category-label {
+    font-size: 0.55rem;
+    line-height: 0.7rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.25rem;
+  }
+  
+  /* Content container */
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 80px; /* Space for floating action button */
+  }
+  
+  /* Reel favorite star */
+  .favorite-star {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 5;
+    color: #FFD700;
+    filter: drop-shadow(0 0 1px rgba(0,0,0,0.7));
   }
 }

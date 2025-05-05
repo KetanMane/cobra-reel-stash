@@ -1,118 +1,110 @@
-
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
-import { useState } from "react";
 import { ReelCard } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
 import { Separator } from "@/components/ui/separator";
-import { MoreVertical, Trash2, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useViewType } from "@/hooks/useViewType";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ViewType } from "@/hooks/useViewType";
+import { SavedReel } from "@/lib/types";
+import { useState } from "react";
+
+interface TrashedReel extends SavedReel {
+  deletedAt: string;
+  expiresAt: string;
+}
 
 export default function TrashPage() {
-  const { trashedReels, restoreFromTrash, emptyTrash, permanentlyDeleteReel } = useReels();
   const { isExpanded } = useSidebar();
+  const { trashedReels, restoreFromTrash, permanentlyDeleteReel, emptyTrash } = useReels();
+  const [sortBy, setSortBy] = useState("newest");
   const { viewType } = useViewType();
-  const [showEmptyTrashDialog, setShowEmptyTrashDialog] = useState(false);
   
-  // Helper function to format date
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return '';
-    
-    try {
-      const date = new Date(dateString);
-      const day = date.getDate();
-      const month = date.toLocaleString('default', { month: 'short' });
-      const year = date.getFullYear().toString().substr(-2);
-      return `${day} ${month} ${year}`;
-    } catch (e) {
-      return dateString;
+  // Sort reels
+  const sortedReels = [...trashedReels].sort((a, b) => {
+    if (sortBy === "newest") {
+      return new Date(b.deletedAt).getTime() - new Date(a.deletedAt).getTime();
+    } else {
+      return new Date(a.deletedAt).getTime() - new Date(b.deletedAt).getTime();
     }
-  };
+  });
   
   // Get grid class based on view type
   const getGridClass = () => {
     switch(viewType) {
       case 'largeGrid':
-        return "grid grid-cols-2 gap-3"; // 2 cards per row
+        return "grid grid-cols-1 md:grid-cols-2 gap-2"; 
       case 'list':
-        return "flex flex-col gap-3"; // List view
+        return "flex flex-col gap-2"; 
       case 'smallGrid':
       default:
-        return "grid grid-cols-3 gap-2"; // 3 cards per row
+        return "grid grid-cols-2 md:grid-cols-3 gap-1"; 
     }
   };
-
+  
   return (
-    <div className="min-h-screen flex-1">
-      <div className={`flex-1 container max-w-md mx-auto py-4 px-3 space-y-4 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+    <div className="min-h-screen flex-1 relative">
+      <div className={`flex-1 container max-w-md mx-auto py-3 px-2 space-y-2 transition-all duration-300 overflow-auto ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-8 h-8" />
-            <h1 className="text-xl font-bold">Trash</h1>
+            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-7 h-7" />
+            <h1 className="text-lg font-bold">Trash</h1>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" title="More options">
-                <MoreVertical size={18} />
-                <span className="sr-only">More options</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setShowEmptyTrashDialog(true)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                <span>Empty Trash</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button 
+            variant="destructive"
+            size="sm"
+            disabled={trashedReels.length === 0}
+            onClick={() => {
+              if (window.confirm("Are you sure? This will permanently delete all items in trash.")) {
+                emptyTrash();
+              }
+            }}
+          >
+            Empty Trash
+          </Button>
         </div>
 
         <div className="flex justify-center">
           <Separator className="w-full bg-primary/40" />
         </div>
         
-        <div className="space-y-4">
+        {/* Sorting */}
+        <div className="w-24 max-w-[120px]">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full text-xs text-foreground font-medium h-7 bg-secondary">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest</SelectItem>
+              <SelectItem value="oldest">Oldest</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
           {trashedReels.length === 0 ? (
-            <EmptyState type="trash" />
+            <EmptyState type="all" category="Trash" />
           ) : (
+            // Grid layout
             <div className={getGridClass()}>
-              {trashedReels.map((reel) => (
+              {sortedReels.map((reel) => (
                 <div key={reel.id} className="relative">
-                  <ReelCard 
-                    reel={{...reel, selected: false}}
-                    isSelectionMode={false}
-                    onSelect={() => {}}
-                    onOpenReel={() => {}}
-                    viewType={viewType}
-                  />
-                  <div className="absolute top-0 right-0 p-2 flex gap-1">
-                    <Button
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 bg-secondary/50 hover:bg-secondary"
-                      onClick={() => restoreFromTrash(reel.id)}
-                      title="Restore reel"
-                    >
-                      <RefreshCcw size={12} />
+                  <ReelCard reel={reel} isSelectionMode={false} onSelect={() => {}} onOpenReel={() => {}} viewType={viewType} />
+                  <div className="absolute top-1 left-1 flex space-x-1">
+                    <Button variant="ghost" size="icon" onClick={() => restoreFromTrash(reel.id)}>
                       <span className="sr-only">Restore</span>
+                      <span>Restore</span>
                     </Button>
-                    <Button
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 bg-secondary/50 hover:bg-secondary"
-                      onClick={() => permanentlyDeleteReel(reel.id)}
-                      title="Delete permanently"
-                    >
-                      <Trash2 size={12} />
-                      <span className="sr-only">Delete</span>
+                    <Button variant="ghost" size="icon" onClick={() => {
+                      if (window.confirm("Are you sure you want to permanently delete this reel?")) {
+                        permanentlyDeleteReel(reel.id);
+                      }
+                    }}>
+                      <span className="sr-only">Delete Permanently</span>
+                      <span>Delete</span>
                     </Button>
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 px-2 py-1 bg-black/50 text-xs text-white text-center">
-                    Expires: {formatDate(reel.expiresAt)}
                   </div>
                 </div>
               ))}
@@ -120,30 +112,6 @@ export default function TrashPage() {
           )}
         </div>
       </div>
-      
-      {/* Empty Trash Dialog */}
-      <AlertDialog open={showEmptyTrashDialog} onOpenChange={setShowEmptyTrashDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Empty Trash</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete all items in the trash. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                emptyTrash();
-                setShowEmptyTrashDialog(false);
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Empty Trash
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

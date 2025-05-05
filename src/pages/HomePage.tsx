@@ -1,10 +1,9 @@
-
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard, ReelEditDialog } from "@/components/ReelCard";
 import { EmptyState } from "@/components/EmptyState";
 import { Separator } from "@/components/ui/separator";
-import { Grid2x2, LayoutList, LayoutGrid, MoreVertical, Pencil, Plus, Star, Trash2 } from "lucide-react";
+import { Grid2x2, LayoutList, LayoutGrid, MoreVertical, Pencil, Plus, PinIcon, Star, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NotesDialog } from "@/components/NotesDialog";
@@ -19,6 +18,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SavedReel } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { useViewType } from "@/hooks/useViewType";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 export default function HomePage() {
   const { reels, filteredReels, activeCategory, toggleFavorite, deleteReel, updateReel } = useReels();
@@ -29,6 +30,7 @@ export default function HomePage() {
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const isMobile = useIsMobile();
   const { viewType, setViewType } = useViewType();
+  const [pinFavorites, setPinFavorites] = useState(false);
   
   // Multi-select mode state
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -38,14 +40,21 @@ export default function HomePage() {
   const [editReel, setEditReel] = useState<SavedReel | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   
-  // Sort reels
-  const sortedReels = [...filteredReels].sort((a, b) => {
-    if (sortBy === "newest") {
-      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    } else {
-      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-    }
-  });
+  // Sort and filter reels
+  const sortedAndFilteredReels = [...filteredReels]
+    .sort((a, b) => {
+      // If pinFavorites is true, show favorites first
+      if (pinFavorites && a.favorite !== b.favorite) {
+        return a.favorite ? -1 : 1;
+      }
+      
+      // Otherwise sort by date
+      if (sortBy === "newest") {
+        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+      } else {
+        return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      }
+    });
   
   // Handle reel selection
   const handleSelectReel = (id: string) => {
@@ -114,22 +123,22 @@ export default function HomePage() {
     });
   };
   
-  // Get grid class based on view type
+  // Get grid class based on view type for responsive displays
   const getGridClass = () => {
     switch(viewType) {
       case 'largeGrid':
-        return "grid grid-cols-2 gap-2"; // 2 cards per row, reduced gap for mobile
+        return "grid grid-cols-1 md:grid-cols-2 gap-2"; // 1 column on mobile, 2 on larger screens
       case 'list':
-        return "flex flex-col gap-2"; // Reduced gap for mobile
+        return "flex flex-col gap-2"; 
       case 'smallGrid':
       default:
-        return "grid grid-cols-3 gap-1"; // 3 cards per row, minimal gap for mobile
+        return "grid grid-cols-2 md:grid-cols-3 gap-1"; // 2 columns on mobile, 3 on larger screens
     }
   };
   
   return (
     <div className="min-h-screen flex-1 relative">
-      <div className={`flex-1 container max-w-md mx-auto py-3 px-2 space-y-2 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container px-2 py-3 space-y-2 transition-all duration-300 content-container ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section with consistent layout */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -204,8 +213,12 @@ export default function HomePage() {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    Pin Favorites
+                  <DropdownMenuItem onClick={() => setPinFavorites(!pinFavorites)} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <PinIcon className="mr-2 h-4 w-4" />
+                      <span>Pin Favorites</span>
+                    </div>
+                    <Switch checked={pinFavorites} />
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     Batch Select
@@ -220,7 +233,7 @@ export default function HomePage() {
           <Separator className="w-full bg-primary/40" />
         </div>
         
-        {/* Search bar with white background */}
+        {/* Search bar */}
         <div className="w-full">
           <SearchBar />
         </div>
@@ -238,7 +251,7 @@ export default function HomePage() {
           </Select>
         </div>
         
-        {/* Category filtering - horizontal scroll */}
+        {/* Category filtering - more compact */}
         <CategoryFilter />
         
         <div className="space-y-2">
@@ -246,7 +259,7 @@ export default function HomePage() {
             <EmptyState type="all" category={activeCategory} />
           ) : (
             <div className={getGridClass()}>
-              {sortedReels.map((reel) => (
+              {sortedAndFilteredReels.map((reel) => (
                 <ReelCard 
                   key={reel.id} 
                   reel={{...reel, selected: selectedReels.includes(reel.id)}}
