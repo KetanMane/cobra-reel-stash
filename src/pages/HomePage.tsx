@@ -1,4 +1,3 @@
-
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard, ReelEditDialog } from "@/components/ReelCard";
@@ -328,7 +327,6 @@ export default function HomePage() {
         reel={editReel} 
         isOpen={showEditDialog} 
         onClose={() => setShowEditDialog(false)}
-        onSave={handleSaveEditedReel}
       />
     </div>
   );

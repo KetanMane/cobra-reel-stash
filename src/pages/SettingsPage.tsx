@@ -9,6 +9,7 @@ import { useSidebar, ThemeType } from "@/hooks/useSidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useViewType } from "@/hooks/useViewType";
+import { Crown } from "lucide-react";
 
 export default function SettingsPage() {
   const { currentTheme, setTheme } = useSidebar();
@@ -17,38 +18,105 @@ export default function SettingsPage() {
   const { viewType, setViewType } = useViewType();
   const [activeTab, setActiveTab] = useState("account");
 
-  // Group themes by colors
-  const themeGroups = [
+  // Pure color themes inspired by the image
+  const colorThemes = [
     {
-      name: "Dark & Blue",
-      themes: [
-        { id: "default", name: "Default Dark", description: "Clean dark interface with blue accents" },
-        { id: "tech-noir", name: "Tech Noir", description: "Sleek black with neon blue highlights" },
-        { id: "night-sky", name: "Night Sky", description: "Deep blues with starlight accents" },
-        { id: "ocean-sailing", name: "Ocean Sailing", description: "Refreshing blue water-inspired theme" },
-      ]
+      name: "Blue",
+      id: "ocean-sailing",
+      color: "bg-blue-400"
     },
     {
-      name: "Purple & Pink",
-      themes: [
-        { id: "cyber-purple", name: "Cyber Purple", description: "Futuristic purple with neon accents" },
-        { id: "pink-dream", name: "Pink Dream", description: "Sweet pinks and soft purples" },
-        { id: "anime-pastel", name: "Anime Pastel", description: "Bright and colorful anime style" },
-        { id: "aurora-lights", name: "Aurora Lights", description: "Vibrant northern lights colors" },
-        { id: "cherry-blossom", name: "Cherry Blossom", description: "Delicate pinks and whites" },
-      ]
+      name: "Pink",
+      id: "cherry-blossom",
+      color: "bg-pink-400"
     },
     {
-      name: "Earth Tones",
-      themes: [
-        { id: "warm-beige", name: "Warm Beige", description: "Cozy neutral tones for relaxed viewing" },
-        { id: "forest-green", name: "Forest Green", description: "Deep greens inspired by nature" },
-        { id: "mountain-sunset", name: "Mountain Sunset", description: "Warm oranges and purples" },
-        { id: "misty-meadow", name: "Misty Meadow", description: "Soft greens and gentle pastels" },
-        { id: "chocolate-brown", name: "Chocolate Brown", description: "Rich, earthy brown tones" },
-        { id: "desert-dunes", name: "Desert Dunes", description: "Warm sand tones and sunset hues" },
-        { id: "mystic-forest", name: "Mystic Forest", description: "Dark greens with magical accents" },
-      ]
+      name: "Teal",
+      id: "misty-meadow",
+      color: "bg-teal-400"
+    },
+    {
+      name: "Dark",
+      id: "default",
+      color: "bg-gray-800"
+    },
+    {
+      name: "Red",
+      id: "mountain-sunset",
+      color: "bg-red-400"
+    },
+    {
+      name: "Yellow",
+      id: "warm-beige",
+      color: "bg-yellow-400"
+    },
+    {
+      name: "Green",
+      id: "forest-green",
+      color: "bg-green-500"
+    },
+    {
+      name: "Orange",
+      id: "desert-dunes",
+      color: "bg-orange-400"
+    },
+    {
+      name: "Purple",
+      id: "cyber-purple",
+      color: "bg-purple-500",
+      isPremium: true
+    }
+  ];
+
+  // Texture themes
+  const textureThemes = [
+    {
+      name: "Paper",
+      id: "night-sky",
+      color: "bg-gradient-to-br from-gray-100 to-gray-200",
+      dotColor: "bg-blue-400"
+    },
+    {
+      name: "Canvas",
+      id: "warm-beige",
+      color: "bg-gradient-to-br from-amber-50 to-amber-100",
+      dotColor: "bg-red-400"
+    },
+    {
+      name: "Linen",
+      id: "anime-pastel",
+      color: "bg-gradient-to-br from-purple-50 to-purple-100",
+      dotColor: "bg-purple-500"
+    },
+    {
+      name: "Minimal",
+      id: "misty-meadow",
+      color: "bg-gradient-to-br from-gray-50 to-white",
+      dotColor: "bg-green-500"
+    }
+  ];
+
+  // Scene themes
+  const sceneThemes = [
+    {
+      name: "Nature",
+      id: "misty-meadow",
+      image: "/lovable-uploads/bf86b33a-ed0c-4b84-8354-eed54c389c78.png"
+    },
+    {
+      name: "Space",
+      id: "night-sky",
+      image: "/lovable-uploads/d0a06e72-14a8-444f-a0a3-884930c14b8f.png"
+    },
+    {
+      name: "Astronaut",
+      id: "tech-noir",
+      image: "/lovable-uploads/8913af60-6157-40b0-96fa-458888cc390e.png"
+    },
+    {
+      name: "Sky",
+      id: "ocean-sailing",
+      image: "/lovable-uploads/d9d4f479-2706-49ad-9845-6eddeea96620.png"
     }
   ];
   
@@ -127,32 +195,103 @@ export default function SettingsPage() {
             </Button>
           </TabsContent>
           
-          {/* Themes Tab */}
+          {/* Themes Tab - Redesigned with inspiration from the image */}
           <TabsContent value="appearance" className="space-y-4 animate-fade-in">
-            {themeGroups.map((group) => (
-              <div key={group.name} className="space-y-3">
-                <h3 className="font-medium text-sm text-primary">{group.name}</h3>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {group.themes.map((theme) => (
-                    <div
-                      key={theme.id}
-                      className={cn(
-                        "group cursor-pointer rounded-md overflow-hidden border hover:border-primary transition-all hover:scale-105",
-                        theme.id === currentTheme ? "ring-2 ring-primary" : "border-border"
-                      )}
-                      onClick={() => setTheme(theme.id as ThemeType)}
-                    >
-                      <div className={cn("h-24 w-full theme-preview", `theme-preview-${theme.id}`)}></div>
-                      <div className="p-2">
-                        <p className="font-medium text-sm">{theme.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{theme.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Separator className="opacity-50" />
+            {/* Pure Colors Section */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">Pure Color</h3>
               </div>
-            ))}
+              
+              <div className="grid grid-cols-4 gap-3">
+                {colorThemes.map((theme) => (
+                  <div
+                    key={theme.id}
+                    className={cn(
+                      "cursor-pointer transition-all hover:scale-105",
+                      theme.id === currentTheme ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+                    )}
+                    onClick={() => setTheme(theme.id as ThemeType)}
+                  >
+                    <div className={cn(
+                      "h-16 w-full rounded-xl shadow-sm",
+                      theme.color
+                    )}>
+                      {theme.isPremium && (
+                        <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4">
+                          <Crown className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Separator />
+            
+            {/* Texture Section */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">Texture</h3>
+                <Crown className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+              </div>
+              
+              <div className="grid grid-cols-4 gap-3">
+                {textureThemes.map((theme) => (
+                  <div
+                    key={theme.id}
+                    className={cn(
+                      "cursor-pointer transition-all hover:scale-105",
+                      theme.id === currentTheme ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+                    )}
+                    onClick={() => setTheme(theme.id as ThemeType)}
+                  >
+                    <div className={cn(
+                      "h-16 w-full rounded-xl shadow-sm relative overflow-hidden flex items-center justify-center",
+                      theme.color
+                    )}>
+                      <div className={cn("h-4 w-4 rounded-full", theme.dotColor)}></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Separator />
+            
+            {/* Scenery Section */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-lg">Scenery</h3>
+                <Crown className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                {sceneThemes.map((theme) => (
+                  <div
+                    key={theme.id}
+                    className={cn(
+                      "cursor-pointer transition-all hover:scale-105",
+                      theme.id === currentTheme ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""
+                    )}
+                    onClick={() => setTheme(theme.id as ThemeType)}
+                  >
+                    <div className="h-32 w-full rounded-xl shadow-sm overflow-hidden">
+                      <img 
+                        src={theme.image} 
+                        alt={theme.name} 
+                        className="w-full h-full object-cover" 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="text-center text-xs text-muted-foreground mt-6">
+              <p><Crown className="inline h-3 w-3 text-yellow-400 fill-yellow-400 mr-1" /> Premium themes available with Pro plan</p>
+            </div>
           </TabsContent>
           
           {/* Preferences Tab */}

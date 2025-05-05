@@ -3,12 +3,18 @@ import { cn } from "@/lib/utils";
 import { useReels } from "@/hooks/useReels";
 import { Category } from "@/lib/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export function CategoryFilter() {
+export function CategoryFilter({ hideInMobile = false }: { hideInMobile?: boolean }) {
   const { filterByCategory, activeCategory } = useReels();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
   
   const categories: { id: Category | 'All', name: string, emoji?: string }[] = [
     { id: 'All', name: 'All', emoji: '🌟' },
+    { id: 'Notes', name: 'Notes', emoji: '📝' },
     { id: 'Recipes', name: 'Recipes', emoji: '🍳' },
     { id: 'Movies', name: 'Movies', emoji: '🎬' },
     { id: 'Anime', name: 'Anime', emoji: '📺' },
@@ -30,13 +36,70 @@ export function CategoryFilter() {
     { id: 'Funny', name: 'Fun', emoji: '😂' },
     { id: 'Fashion', name: 'Style', emoji: '👗' },
     { id: 'Quotes', name: 'Quote', emoji: '💬' },
-    { id: 'Notes', name: 'Notes', emoji: '📝' },
     { id: 'Uncategorized', name: 'Other', emoji: '📌' }
   ];
 
+  const handleScroll = (direction: 'left' | 'right') => {
+    const container = scrollRef.current;
+    if (!container) return;
+    
+    const scrollAmount = 200; // Adjust as needed
+    if (direction === 'left') {
+      container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+  
+  const checkScrollPosition = () => {
+    const container = scrollRef.current;
+    if (!container) return;
+    
+    setShowLeftArrow(container.scrollLeft > 10);
+    setShowRightArrow(container.scrollLeft < (container.scrollWidth - container.clientWidth - 10));
+  };
+  
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    
+    container.addEventListener('scroll', checkScrollPosition);
+    // Initial check
+    checkScrollPosition();
+    
+    return () => {
+      container.removeEventListener('scroll', checkScrollPosition);
+    };
+  }, []);
+
   return (
-    <div className="w-full overflow-hidden">
-      <div className="flex flex-wrap gap-0.5 pb-1">
+    <div className={cn("w-full relative overflow-hidden", hideInMobile && "hidden md:block")}>
+      {/* Left scroll button */}
+      {showLeftArrow && (
+        <button
+          onClick={() => handleScroll('left')}
+          className="absolute left-0 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm rounded-full p-1 z-10 shadow-md"
+          aria-label="Scroll left"
+        >
+          <ChevronLeft size={16} />
+        </button>
+      )}
+      
+      {/* Right scroll button */}
+      {showRightArrow && (
+        <button
+          onClick={() => handleScroll('right')}
+          className="absolute right-0 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm rounded-full p-1 z-10 shadow-md"
+          aria-label="Scroll right"
+        >
+          <ChevronRight size={16} />
+        </button>
+      )}
+      
+      <div 
+        ref={scrollRef}
+        className="flex gap-0.5 pb-1 overflow-x-auto scrollbar-none"
+      >
         {categories.map((category) => (
           <button
             key={category.id}
@@ -46,7 +109,7 @@ export function CategoryFilter() {
               activeCategory === category.id
                 ? "bg-primary text-primary-foreground font-medium"
                 : category.id === "Notes"
-                  ? "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                  ? "bg-gray-900 text-gray-100 hover:bg-gray-800"
                   : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
             )}
           >

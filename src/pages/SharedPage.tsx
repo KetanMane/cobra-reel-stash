@@ -14,7 +14,6 @@ import { SaveReelForm } from "@/components/SaveReelForm";
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SavedReel } from "@/lib/types";
-import { CategoryFilter } from "@/components/CategoryFilter";
 
 export default function SharedPage() {
   const { isExpanded } = useSidebar();
@@ -74,11 +73,6 @@ export default function SharedPage() {
               <SelectItem value="oldest">Oldest</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        
-        {/* Category filtering - more compact */}
-        <div className="animate-fade-in">
-          <CategoryFilter />
         </div>
         
         {/* Content */}

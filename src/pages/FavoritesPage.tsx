@@ -1,4 +1,3 @@
-
 import { useReels } from "@/hooks/useReels";
 import { useSidebar } from "@/hooks/useSidebar";
 import { ReelCard, ReelEditDialog } from "@/components/ReelCard";
@@ -12,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { SavedReel } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { useViewType } from "@/hooks/useViewType";
+import { ReelViewDialog } from "@/components/ReelViewDialog";
 
 export default function FavoritesPage() {
   const { reels, toggleFavorite, deleteReel, updateReel } = useReels();
@@ -26,6 +26,10 @@ export default function FavoritesPage() {
   // Edit dialog state
   const [editReel, setEditReel] = useState<SavedReel | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  
+  // View reel dialog state
+  const [selectedReel, setSelectedReel] = useState<SavedReel | null>(null);
+  const [showReelViewDialog, setShowReelViewDialog] = useState(false);
   
   const favoriteReels = reels.filter(reel => reel.favorite);
 
@@ -210,6 +214,13 @@ export default function FavoritesPage() {
         isOpen={showEditDialog} 
         onClose={() => setShowEditDialog(false)}
         onSave={handleSaveEditedReel}
+      />
+      
+      {/* View Reel Dialog */}
+      <ReelViewDialog
+        reel={selectedReel}
+        isOpen={showReelViewDialog}
+        onClose={() => setShowReelViewDialog(false)}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { SavedReel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { useReels } from "@/hooks/useReels";
 import { useState, useEffect } from "react";
 import { Check, Star } from "lucide-react";
@@ -133,7 +134,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
               reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
               reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
               reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-              reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
+              reel.category === "Notes" && "bg-gray-900 text-gray-100",
               reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
             )}>
               {reel.category}
@@ -199,7 +200,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
           reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
           reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
           reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-          reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
+          reel.category === "Notes" && "bg-gray-900 text-gray-100",
           reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
         )}>
           {reel.category}
@@ -220,7 +221,7 @@ export function ReelViewDialog({
   isOpen: boolean; 
   onClose: () => void;
 }) {
-  if (!reel) return null;
+  if (!reel || !isOpen) return null;
   
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
@@ -247,7 +248,7 @@ export function ReelViewDialog({
               reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
               reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
               reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-              reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
+              reel.category === "Notes" && "bg-gray-900 text-gray-100",
               reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
             )}>
               {reel.category}
@@ -277,5 +278,23 @@ export function ReelViewDialog({
   );
 }
 
-// Export the old name for backward compatibility
-export const ReelEditDialog = ReelViewDialog;
+// Fix for compatibility with Home and Favorites pages
+export function ReelEditDialog({ 
+  reel, 
+  isOpen, 
+  onClose,
+  onSave
+}: { 
+  reel: SavedReel | null; 
+  isOpen: boolean; 
+  onClose: () => void;
+  onSave?: (id: string, title: string, summary: string) => void;
+}) {
+  return (
+    <ReelViewDialog
+      reel={reel}
+      isOpen={isOpen}
+      onClose={onClose}
+    />
+  );
+}
