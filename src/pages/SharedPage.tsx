@@ -1,3 +1,4 @@
+
 import { useSidebar } from "@/hooks/useSidebar";
 import { useReels } from "@/hooks/useReels";
 import { Separator } from "@/components/ui/separator";
@@ -6,6 +7,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { useState } from "react";
 import { useViewType } from "@/hooks/useViewType";
 import { EmptyState } from "@/components/EmptyState";
+import { ReelCard } from "@/components/ReelCard";
 
 export default function SharedPage() {
   const { isExpanded } = useSidebar();
@@ -20,35 +22,19 @@ export default function SharedPage() {
   // Get grid class based on view type
   const getGridClass = () => {
     switch(viewType) {
-      case 'largeGrid':
-        return "grid grid-cols-1 md:grid-cols-2 gap-2"; 
       case 'list':
-        return "flex flex-col gap-2"; 
-      case 'smallGrid':
+        return "flex flex-col gap-2 animate-fade-in"; 
+      case 'grid':
       default:
-        return "grid grid-cols-2 md:grid-cols-3 gap-1"; 
+        return "grid grid-cols-2 gap-2 animate-fade-in"; 
     }
-  };
-  
-  // Function to render empty state
-  const renderEmptyState = () => {
-    return (
-      <div className="flex flex-col items-center justify-center p-4">
-        <div className="text-center">
-          <h3 className="text-lg font-medium mb-2">No shared reels</h3>
-          <p className="text-sm text-muted-foreground">
-            Reels shared with you will appear here
-          </p>
-        </div>
-      </div>
-    );
   };
 
   return (
     <div className="min-h-screen flex-1 relative">
-      <div className={`flex-1 container max-w-md mx-auto py-3 px-2 space-y-2 transition-all duration-300 overflow-auto ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container px-2 py-3 space-y-2 transition-all duration-300 content-container ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
             <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-7 h-7" />
             <h1 className="text-lg font-bold">Shared</h1>
@@ -60,12 +46,12 @@ export default function SharedPage() {
         </div>
         
         {/* Search bar */}
-        <div className="w-full">
+        <div className="w-full animate-fade-in">
           <SearchBar />
         </div>
         
         {/* Sorting */}
-        <div className="w-24 max-w-[120px]">
+        <div className="w-24 max-w-[120px] animate-fade-in">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full text-xs text-foreground font-medium h-7 bg-secondary">
               <SelectValue placeholder="Sort by" />
@@ -77,9 +63,29 @@ export default function SharedPage() {
           </Select>
         </div>
         
-        {/* Category filtering - more compact */}
-        <div className="w-full">
-          <EmptyState type="all" category={activeCategory} />
+        {/* Content */}
+        <div className="space-y-2">
+          {sharedReels.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 animate-fade-in">
+              <h3 className="text-lg font-medium text-center">No shared reels</h3>
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Reels shared with you will appear here
+              </p>
+            </div>
+          ) : (
+            <div className={getGridClass()}>
+              {sharedReels.map((reel) => (
+                <ReelCard 
+                  key={reel.id} 
+                  reel={reel}
+                  isSelectionMode={false}
+                  onSelect={() => {}}
+                  onOpenReel={() => {}}
+                  viewType={viewType}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

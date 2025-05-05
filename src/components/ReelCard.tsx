@@ -1,4 +1,3 @@
-
 import { SavedReel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -101,28 +100,30 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
         onMouseUp={handleTouchEnd}
         onMouseLeave={handleTouchEnd}
       >
+        {/* Selected indicator */}
+        {reel.selected && (
+          <div className="absolute top-2 left-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
+            <Check size={14} className="text-white" />
+          </div>
+        )}
+        
+        {/* Favorite star */}
         {reel.favorite && (
-          <div className="favorite-star" onClick={handleToggleFavorite}>
+          <div className="absolute top-2 right-2 z-10" onClick={handleToggleFavorite}>
             <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
           </div>
         )}
         
         {!reel.favorite && (
           <div 
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
+            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
             onClick={handleToggleFavorite}
           >
             <Star size={16} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
           </div>
         )}
         
-        {reel.selected && (
-          <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
-            <Check size={14} className="text-white" />
-          </div>
-        )}
-        
-        <div className="p-3">
+        <div className="p-3 pt-8">
           <h3 className="text-sm font-medium mb-1 line-clamp-1">{reel.title}</h3>
           <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{reel.summary}</p>
           
@@ -133,6 +134,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
               reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
               reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
               reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
+              reel.category === "Notes" && "bg-emerald-900/50 text-emerald-300",
               reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
             )}>
               {reel.category}
@@ -159,8 +161,16 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
       onMouseUp={handleTouchEnd}
       onMouseLeave={handleTouchEnd}
     >
+      {/* Selected indicator - moved to left side */}
+      {reel.selected && (
+        <div className="absolute top-2 left-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
+          <Check size={14} className="text-white" />
+        </div>
+      )}
+      
+      {/* Favorite star - stays on right side */}
       {reel.favorite && (
-        <div className="favorite-star" onClick={handleToggleFavorite}>
+        <div className="absolute top-2 right-2 z-10" onClick={handleToggleFavorite}>
           <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
         </div>
       )}
@@ -170,17 +180,11 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
           className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
           onClick={handleToggleFavorite}
         >
-          <Star size={14} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
+          <Star size={16} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
         </div>
       )}
       
-      {reel.selected && (
-        <div className="absolute top-2 right-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
-          <Check size={14} className="text-white" />
-        </div>
-      )}
-      
-      <CardHeader className="pb-1 pt-2 px-3">
+      <CardHeader className="pb-1 pt-8 px-3">
         <CardTitle className="text-sm font-medium line-clamp-1">{reel.title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-3 pb-0">
@@ -195,6 +199,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
           reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
           reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
           reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
+          reel.category === "Notes" && "bg-emerald-900/50 text-emerald-300",
           reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
         )}>
           {reel.category}

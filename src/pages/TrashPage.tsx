@@ -7,9 +7,10 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import { useViewType } from "@/hooks/useViewType";
 import { Category, SavedReel } from "@/lib/types";
+import { toast } from "@/hooks/use-toast";
 
 interface TrashedReel extends SavedReel {
   deletedAt: string;
@@ -35,9 +36,10 @@ export default function TrashPage() {
   const getGridClass = () => {
     switch(viewType) {
       case 'list':
-        return "flex flex-col gap-2"; 
-      default: // grid (previously largeGrid)
-        return "grid grid-cols-1 md:grid-cols-2 gap-2"; 
+        return "flex flex-col gap-2 animate-fade-in"; 
+      case 'grid':
+      default:
+        return "grid grid-cols-2 gap-2 animate-fade-in"; 
     }
   };
   
@@ -50,7 +52,7 @@ export default function TrashPage() {
   
   return (
     <div className="min-h-screen flex-1 relative">
-      <div className={`flex-1 container max-w-md mx-auto py-3 px-2 space-y-2 transition-all duration-300 overflow-auto ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container px-2 py-3 space-y-2 transition-all duration-300 content-container ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section */}
         <div className="flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
@@ -96,23 +98,39 @@ export default function TrashPage() {
               </p>
             </div>
           ) : (
-            // Grid layout
-            <div className={`${getGridClass()} animate-fade-in`}>
+            <div className={getGridClass()}>
               {sortedReels.map((reel) => (
                 <div key={reel.id} className="relative animate-scale-in">
                   <ReelCard reel={reel} isSelectionMode={false} onSelect={() => {}} onOpenReel={() => {}} viewType={viewType} />
                   <div className="absolute top-1 left-1 flex space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => restoreFromTrash(reel.id)} className="transition-all hover:scale-105">
+                    <Button 
+                      variant="secondary" 
+                      size="sm" 
+                      onClick={() => {
+                        restoreFromTrash(reel.id);
+                        toast({
+                          title: "Success",
+                          description: "Reel restored successfully"
+                        });
+                      }} 
+                      className="transition-all hover:scale-105 flex items-center gap-1"
+                    >
+                      <RotateCcw size={14} />
                       <span className="sr-only">Restore</span>
-                      <span>Restore</span>
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => {
-                      if (window.confirm("Are you sure you want to permanently delete this reel?")) {
-                        permanentlyDeleteReel(reel.id);
-                      }
-                    }} className="transition-all hover:scale-105">
+                    
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to permanently delete this reel?")) {
+                          permanentlyDeleteReel(reel.id);
+                        }
+                      }} 
+                      className="transition-all hover:scale-105"
+                    >
+                      <Trash2 size={14} />
                       <span className="sr-only">Delete Permanently</span>
-                      <span>Delete</span>
                     </Button>
                   </div>
                 </div>

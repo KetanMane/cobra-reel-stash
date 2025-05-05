@@ -96,27 +96,25 @@ export default function FavoritesPage() {
     });
   };
   
-  // Get grid class based on view type
+  // Get grid class based on view type for responsive displays
   const getGridClass = () => {
     switch(viewType) {
-      case 'largeGrid':
-        return "grid grid-cols-1 gap-3";
       case 'list':
-        return "flex flex-col gap-3";
-      case 'smallGrid':
+        return "flex flex-col gap-2 animate-fade-in"; 
+      case 'grid':
       default:
-        return "grid grid-cols-3 gap-2";
+        return "grid grid-cols-2 gap-2 animate-fade-in"; 
     }
   };
   
   return (
     <div className="min-h-screen flex-1 relative">
-      <div className={`flex-1 container max-w-md mx-auto py-4 px-3 space-y-4 transition-all duration-300 ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
+      <div className={`flex-1 container px-2 py-3 space-y-2 transition-all duration-300 content-container ${isExpanded ? 'opacity-60 pointer-events-none' : ''}`}>
         {/* Header section with consistent layout */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
-            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-8 h-8" />
-            <h1 className="text-xl font-bold">Favorites</h1>
+            <img src="/lovable-uploads/f41b8346-c7fe-437f-9020-e26ed4c5ba93.png" alt="CobraSave" className="w-7 h-7" />
+            <h1 className="text-lg font-bold">Favorites</h1>
           </div>
           
           {isSelectionMode ? (
@@ -127,7 +125,7 @@ export default function FavoritesPage() {
                 onClick={handleFavoriteSelected}
                 title="Remove from favorites"
               >
-                <Star size={18} className="text-yellow-500" />
+                <Star size={16} className="text-yellow-500" />
                 <span className="sr-only">Remove from favorites</span>
               </Button>
               
@@ -137,7 +135,7 @@ export default function FavoritesPage() {
                 onClick={handleDeleteSelected}
                 title="Delete selected"
               >
-                <Trash2 size={18} className="text-red-500" />
+                <Trash2 size={16} className="text-red-500" />
                 <span className="sr-only">Delete selected</span>
               </Button>
               
@@ -147,7 +145,7 @@ export default function FavoritesPage() {
                 onClick={handleCancelSelection}
                 title="Cancel selection"
               >
-                <span className="text-sm">Cancel</span>
+                <span className="text-xs">Cancel</span>
               </Button>
             </div>
           ) : (
@@ -158,21 +156,18 @@ export default function FavoritesPage() {
                 onClick={() => setShowNotesDialog(true)}
                 title="Create Note"
               >
-                <Pencil size={18} />
+                <Pencil size={16} />
                 <span className="sr-only">Create Note</span>
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" title="More options">
-                    <MoreVertical size={18} />
+                    <MoreVertical size={16} />
                     <span className="sr-only">More options</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    Pin Favorites
-                  </DropdownMenuItem>
                   <DropdownMenuItem>
                     Batch Select
                   </DropdownMenuItem>
@@ -186,7 +181,7 @@ export default function FavoritesPage() {
           <Separator className="w-full bg-primary/40" />
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-2">
           {favoriteReels.length === 0 ? (
             <EmptyState type="all" category="All" />
           ) : (

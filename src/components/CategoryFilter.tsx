@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils";
 import { useReels } from "@/hooks/useReels";
 import { Category } from "@/lib/types";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function CategoryFilter() {
   const { filterByCategory, activeCategory } = useReels();
@@ -30,12 +30,13 @@ export function CategoryFilter() {
     { id: 'Funny', name: 'Fun', emoji: '😂' },
     { id: 'Fashion', name: 'Style', emoji: '👗' },
     { id: 'Quotes', name: 'Quote', emoji: '💬' },
+    { id: 'Notes', name: 'Notes', emoji: '📝' },
     { id: 'Uncategorized', name: 'Other', emoji: '📌' }
   ];
 
   return (
     <ScrollArea className="w-full -mx-2 px-2">
-      <div className="flex gap-0.5 w-max pb-1">
+      <div className="flex flex-wrap gap-0.5 w-max pb-1">
         {categories.map((category) => (
           <button
             key={category.id}
@@ -52,7 +53,6 @@ export function CategoryFilter() {
           </button>
         ))}
       </div>
-      <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
 }
