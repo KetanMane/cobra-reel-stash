@@ -17,23 +17,39 @@ export default function SettingsPage() {
   const { viewType, setViewType } = useViewType();
   const [activeTab, setActiveTab] = useState("account");
 
-  const themes: { id: ThemeType; name: string; description: string }[] = [
-    { id: "default", name: "Default Dark", description: "Clean dark interface with blue accents" },
-    { id: "cyber-purple", name: "Cyber Purple", description: "Futuristic purple with neon accents" },
-    { id: "warm-beige", name: "Warm Beige", description: "Cozy neutral tones for relaxed viewing" },
-    { id: "forest-green", name: "Forest Green", description: "Deep greens inspired by nature" },
-    { id: "ocean-sailing", name: "Ocean Sailing", description: "Refreshing blue water-inspired theme" },
-    { id: "mountain-sunset", name: "Mountain Sunset", description: "Warm oranges and purples" },
-    { id: "night-sky", name: "Night Sky", description: "Deep blues with starlight accents" },
-    { id: "misty-meadow", name: "Misty Meadow", description: "Soft greens and gentle pastels" },
-    { id: "pink-dream", name: "Pink Dream", description: "Sweet pinks and soft purples" },
-    { id: "chocolate-brown", name: "Chocolate Brown", description: "Rich, earthy brown tones" },
-    { id: "anime-pastel", name: "Anime Pastel", description: "Bright and colorful anime style" },
-    { id: "aurora-lights", name: "Aurora Lights", description: "Vibrant northern lights colors" },
-    { id: "desert-dunes", name: "Desert Dunes", description: "Warm sand tones and sunset hues" },
-    { id: "cherry-blossom", name: "Cherry Blossom", description: "Delicate pinks and whites" },
-    { id: "mystic-forest", name: "Mystic Forest", description: "Dark greens with magical accents" },
-    { id: "tech-noir", name: "Tech Noir", description: "Sleek black with neon blue highlights" },
+  // Group themes by colors
+  const themeGroups = [
+    {
+      name: "Dark & Blue",
+      themes: [
+        { id: "default", name: "Default Dark", description: "Clean dark interface with blue accents" },
+        { id: "tech-noir", name: "Tech Noir", description: "Sleek black with neon blue highlights" },
+        { id: "night-sky", name: "Night Sky", description: "Deep blues with starlight accents" },
+        { id: "ocean-sailing", name: "Ocean Sailing", description: "Refreshing blue water-inspired theme" },
+      ]
+    },
+    {
+      name: "Purple & Pink",
+      themes: [
+        { id: "cyber-purple", name: "Cyber Purple", description: "Futuristic purple with neon accents" },
+        { id: "pink-dream", name: "Pink Dream", description: "Sweet pinks and soft purples" },
+        { id: "anime-pastel", name: "Anime Pastel", description: "Bright and colorful anime style" },
+        { id: "aurora-lights", name: "Aurora Lights", description: "Vibrant northern lights colors" },
+        { id: "cherry-blossom", name: "Cherry Blossom", description: "Delicate pinks and whites" },
+      ]
+    },
+    {
+      name: "Earth Tones",
+      themes: [
+        { id: "warm-beige", name: "Warm Beige", description: "Cozy neutral tones for relaxed viewing" },
+        { id: "forest-green", name: "Forest Green", description: "Deep greens inspired by nature" },
+        { id: "mountain-sunset", name: "Mountain Sunset", description: "Warm oranges and purples" },
+        { id: "misty-meadow", name: "Misty Meadow", description: "Soft greens and gentle pastels" },
+        { id: "chocolate-brown", name: "Chocolate Brown", description: "Rich, earthy brown tones" },
+        { id: "desert-dunes", name: "Desert Dunes", description: "Warm sand tones and sunset hues" },
+        { id: "mystic-forest", name: "Mystic Forest", description: "Dark greens with magical accents" },
+      ]
+    }
   ];
   
   return (
@@ -60,9 +76,9 @@ export default function SettingsPage() {
           </TabsList>
           
           {/* Account Tab */}
-          <TabsContent value="account" className="space-y-4">
+          <TabsContent value="account" className="space-y-4 animate-fade-in">
             {/* User Profile Section */}
-            <div className="p-4 bg-secondary/50 rounded-md space-y-4 animate-fade-in">
+            <div className="p-4 bg-secondary/50 rounded-md space-y-4">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src={user && 'avatar' in user ? user.avatar : ''} />
@@ -84,39 +100,64 @@ export default function SettingsPage() {
               </div>
             </div>
             
+            {/* Billing Section */}
+            <div className="rounded-md border border-accent/10 overflow-hidden">
+              <div className="bg-secondary/50 p-3">
+                <h3 className="font-medium">Subscription</h3>
+                <p className="text-sm text-muted-foreground">Manage your plan and billing</p>
+              </div>
+              
+              <Separator />
+              
+              <div className="p-4">
+                <div className="bg-primary/5 rounded-md p-3 mb-3">
+                  <p className="font-medium">Current Plan: <span className="text-primary">Free</span></p>
+                  <p className="text-sm text-muted-foreground">5 reels per day</p>
+                </div>
+                
+                <Button className="w-full transition-all hover:scale-105">
+                  Upgrade to Pro
+                </Button>
+              </div>
+            </div>
+            
             {/* Logout Button */}
-            <Button variant="destructive" className="w-full transition-all hover:scale-105 animate-fade-in">
+            <Button variant="destructive" className="w-full transition-all hover:scale-105">
               Log Out
             </Button>
           </TabsContent>
           
           {/* Themes Tab */}
-          <TabsContent value="appearance" className="space-y-4">
-            <div className="p-3 space-y-3 animate-fade-in">
-              <div className="grid grid-cols-2 gap-3">
-                {themes.map((theme) => (
-                  <div
-                    key={theme.id}
-                    className={cn(
-                      "group cursor-pointer rounded-md overflow-hidden border hover:border-primary transition-all hover:scale-105",
-                      theme.id === currentTheme ? "ring-2 ring-primary" : "border-border"
-                    )}
-                    onClick={() => setTheme(theme.id)}
-                  >
-                    <div className={cn("h-24 w-full theme-preview", `theme-preview-${theme.id}`)}></div>
-                    <div className="p-2">
-                      <p className="font-medium text-sm">{theme.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{theme.description}</p>
+          <TabsContent value="appearance" className="space-y-4 animate-fade-in">
+            {themeGroups.map((group) => (
+              <div key={group.name} className="space-y-3">
+                <h3 className="font-medium text-sm text-primary">{group.name}</h3>
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {group.themes.map((theme) => (
+                    <div
+                      key={theme.id}
+                      className={cn(
+                        "group cursor-pointer rounded-md overflow-hidden border hover:border-primary transition-all hover:scale-105",
+                        theme.id === currentTheme ? "ring-2 ring-primary" : "border-border"
+                      )}
+                      onClick={() => setTheme(theme.id as ThemeType)}
+                    >
+                      <div className={cn("h-24 w-full theme-preview", `theme-preview-${theme.id}`)}></div>
+                      <div className="p-2">
+                        <p className="font-medium text-sm">{theme.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{theme.description}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <Separator className="opacity-50" />
               </div>
-            </div>
+            ))}
           </TabsContent>
           
           {/* Preferences Tab */}
-          <TabsContent value="preferences" className="space-y-4">
-            <div className="rounded-md border border-accent/10 overflow-hidden animate-fade-in">
+          <TabsContent value="preferences" className="space-y-4 animate-fade-in">
+            <div className="rounded-md border border-accent/10 overflow-hidden">
               <div className="bg-secondary/50 p-3">
                 <h3 className="font-medium">Display Settings</h3>
                 <p className="text-sm text-muted-foreground">Manage how content appears</p>
@@ -127,10 +168,18 @@ export default function SettingsPage() {
               <div className="p-3 space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium">Compact View</p>
-                    <p className="text-sm text-muted-foreground">Show more content on screen</p>
+                    <p className="font-medium">View Mode</p>
+                    <p className="text-sm text-muted-foreground">Grid or list layout</p>
                   </div>
-                  <Switch className="transition-all" />
+                  <div className="flex items-center gap-2">
+                    <span className={cn("text-xs", viewType === "list" ? "text-primary font-medium" : "text-muted-foreground")}>List</span>
+                    <Switch 
+                      checked={viewType === "grid"} 
+                      onCheckedChange={(checked) => setViewType(checked ? "grid" : "list")}
+                      className="transition-all" 
+                    />
+                    <span className={cn("text-xs", viewType === "grid" ? "text-primary font-medium" : "text-muted-foreground")}>Grid</span>
+                  </div>
                 </div>
                 
                 <div className="flex items-center justify-between">
@@ -156,6 +205,33 @@ export default function SettingsPage() {
                   </div>
                   <Switch defaultChecked className="transition-all" />
                 </div>
+              </div>
+            </div>
+            
+            <div className="rounded-md border border-accent/10 overflow-hidden">
+              <div className="bg-secondary/50 p-3">
+                <h3 className="font-medium">Privacy & Data</h3>
+                <p className="text-sm text-muted-foreground">Manage your data and privacy</p>
+              </div>
+              
+              <Separator />
+              
+              <div className="p-3 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Analytics</p>
+                    <p className="text-sm text-muted-foreground">Help improve CobraSave</p>
+                  </div>
+                  <Switch defaultChecked className="transition-all" />
+                </div>
+                
+                <Button variant="outline" size="sm" className="w-full transition-all hover:scale-105">
+                  Export My Data
+                </Button>
+                
+                <Button variant="outline" size="sm" className="w-full text-destructive-foreground bg-destructive/10 border-destructive/20 hover:bg-destructive/20 transition-all hover:scale-105">
+                  Delete Account
+                </Button>
               </div>
             </div>
           </TabsContent>

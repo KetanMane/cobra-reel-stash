@@ -1,13 +1,11 @@
+
 import { SavedReel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReels } from "@/hooks/useReels";
 import { useState, useEffect } from "react";
-import { Check, ExternalLink, Star, Trash2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Check, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { ViewType } from "@/hooks/useViewType";
 
@@ -35,7 +33,6 @@ interface ReelCardProps {
 }
 
 export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType }: ReelCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const { toggleFavorite } = useReels();
   
@@ -66,6 +63,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
     if (isSelectionMode) {
       onSelect(reel.id);
     } else {
+      // View the content instead of editing
       onOpenReel(reel);
     }
   };
@@ -100,30 +98,31 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
         onMouseUp={handleTouchEnd}
         onMouseLeave={handleTouchEnd}
       >
-        {/* Selected indicator */}
+        {/* Selected indicator - moved to top-left */}
         {reel.selected && (
           <div className="absolute top-2 left-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
             <Check size={14} className="text-white" />
           </div>
         )}
         
-        {/* Favorite star */}
-        {reel.favorite && (
-          <div className="absolute top-2 right-2 z-10" onClick={handleToggleFavorite}>
-            <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
-          </div>
-        )}
+        {/* Favorite star - positioned at top-right always */}
+        <div 
+          className={cn(
+            "absolute top-2 right-2 z-10 transition-opacity",
+            !reel.favorite && "opacity-0 group-hover:opacity-100"
+          )}
+          onClick={handleToggleFavorite}
+        >
+          <Star 
+            size={16} 
+            className={cn(
+              "transition-colors",
+              reel.favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-500"
+            )} 
+          />
+        </div>
         
-        {!reel.favorite && (
-          <div 
-            className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
-            onClick={handleToggleFavorite}
-          >
-            <Star size={16} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
-          </div>
-        )}
-        
-        <div className="p-3 pt-8">
+        <div className={cn("p-3", reel.selected ? "pt-8" : "pt-6")}>
           <h3 className="text-sm font-medium mb-1 line-clamp-1">{reel.title}</h3>
           <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{reel.summary}</p>
           
@@ -134,7 +133,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
               reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
               reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
               reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-              reel.category === "Notes" && "bg-emerald-900/50 text-emerald-300",
+              reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
               reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
             )}>
               {reel.category}
@@ -161,30 +160,31 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
       onMouseUp={handleTouchEnd}
       onMouseLeave={handleTouchEnd}
     >
-      {/* Selected indicator - moved to left side */}
+      {/* Selected indicator - moved to top-left */}
       {reel.selected && (
         <div className="absolute top-2 left-2 bg-primary rounded-full p-1 z-10 animate-scale-in">
           <Check size={14} className="text-white" />
         </div>
       )}
       
-      {/* Favorite star - stays on right side */}
-      {reel.favorite && (
-        <div className="absolute top-2 right-2 z-10" onClick={handleToggleFavorite}>
-          <Star size={16} fill="#FFD700" stroke="#FFD700" className="drop-shadow-md" />
-        </div>
-      )}
+      {/* Favorite star - positioned at top-right always */}
+      <div 
+        className={cn(
+          "absolute top-2 right-2 z-10 transition-opacity",
+          !reel.favorite && "opacity-0 group-hover:opacity-100"
+        )}
+        onClick={handleToggleFavorite}
+      >
+        <Star 
+          size={16} 
+          className={cn(
+            "transition-colors",
+            reel.favorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground hover:text-yellow-500"
+          )} 
+        />
+      </div>
       
-      {!reel.favorite && (
-        <div 
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10" 
-          onClick={handleToggleFavorite}
-        >
-          <Star size={16} className="text-muted-foreground hover:text-yellow-500 transition-colors" />
-        </div>
-      )}
-      
-      <CardHeader className="pb-1 pt-8 px-3">
+      <CardHeader className={cn("pb-1 px-3", reel.selected ? "pt-8" : "pt-6")}>
         <CardTitle className="text-sm font-medium line-clamp-1">{reel.title}</CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-3 pb-0">
@@ -199,7 +199,7 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
           reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
           reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
           reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
-          reel.category === "Notes" && "bg-emerald-900/50 text-emerald-300",
+          reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
           reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
         )}>
           {reel.category}
@@ -210,84 +210,72 @@ export function ReelCard({ reel, isSelectionMode, onSelect, onOpenReel, viewType
   );
 }
 
-// Component for the edit dialog when a reel is tapped
-export function ReelEditDialog({ 
+// Component for viewing a reel's content
+export function ReelViewDialog({ 
   reel, 
   isOpen, 
-  onClose,
-  onSave 
+  onClose
 }: { 
   reel: SavedReel | null; 
   isOpen: boolean; 
   onClose: () => void;
-  onSave: (id: string, title: string, summary: string) => void;
 }) {
-  const [editedTitle, setEditedTitle] = useState("");
-  const [editedSummary, setEditedSummary] = useState("");
-  
-  // Set initial values when dialog opens
-  useEffect(() => {
-    if (reel) {
-      setEditedTitle(reel.title);
-      setEditedSummary(reel.summary);
-    }
-  }, [reel]);
-  
-  const handleSave = () => {
-    if (reel) {
-      onSave(reel.id, editedTitle, editedSummary);
-      onClose();
-    }
-  };
-  
-  const handleOpenSource = () => {
-    if (reel?.sourceUrl) {
-      window.open(reel.sourceUrl, '_blank');
-    } else {
-      toast({
-        title: "Source not available",
-        description: "The source URL for this reel is not available.",
-        variant: "destructive"
-      });
-    }
-  };
-  
   if (!reel) return null;
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle>Edit Reel</DialogTitle>
-          <Button variant="outline" size="sm" onClick={handleOpenSource} className="flex gap-1 transition-all hover:scale-105">
-            <ExternalLink size={14} />
-            <span>Open Source</span>
-          </Button>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Input
-              placeholder="Reel Title"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Textarea
-              placeholder="Reel Summary"
-              className="min-h-[200px]"
-              value={editedSummary}
-              onChange={(e) => setEditedSummary(e.target.value)}
-            />
-          </div>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+      <div 
+        className="bg-card max-w-md w-full rounded-lg p-4 shadow-xl animate-scale-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <h2 className="text-lg font-bold">{reel.title}</h2>
+          {reel.favorite && <Star size={18} className="fill-yellow-400 text-yellow-400" />}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} className="transition-all hover:scale-105">
-            Cancel
+        
+        <Separator className="mb-4" />
+        
+        <div className="space-y-3">
+          <div className="bg-secondary/30 p-3 rounded-md">
+            <p className="text-sm whitespace-pre-wrap">{reel.summary}</p>
+          </div>
+          
+          <div className="flex justify-between items-center text-sm">
+            <span className={cn(
+              "px-2 py-0.5 rounded-full",
+              reel.category === "Recipes" && "bg-green-900/50 text-green-300",
+              reel.category === "Movies" && "bg-blue-900/50 text-blue-300",
+              reel.category === "Tools" && "bg-orange-900/50 text-orange-300",
+              reel.category === "Anime" && "bg-purple-900/50 text-purple-300",
+              reel.category === "Notes" && "bg-gray-900/50 text-gray-100",
+              reel.category === "Uncategorized" && "bg-gray-900/50 text-gray-300"
+            )}>
+              {reel.category}
+            </span>
+            <span className="text-muted-foreground">Saved: {formatDate(reel.timestamp)}</span>
+          </div>
+          
+          {reel.sourceUrl && (
+            <Button 
+              variant="outline" 
+              className="w-full mt-2 transition-all hover:scale-105"
+              onClick={() => window.open(reel.sourceUrl, '_blank')}
+            >
+              View Source
+            </Button>
+          )}
+          
+          <Button 
+            className="w-full transition-all hover:scale-105"
+            onClick={onClose}
+          >
+            Close
           </Button>
-          <Button onClick={handleSave} className="transition-all hover:scale-105">Save Changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 }
+
+// Export the old name for backward compatibility
+export const ReelEditDialog = ReelViewDialog;

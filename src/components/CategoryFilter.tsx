@@ -35,8 +35,8 @@ export function CategoryFilter() {
   ];
 
   return (
-    <ScrollArea className="w-full -mx-2 px-2">
-      <div className="flex flex-wrap gap-0.5 w-max pb-1">
+    <div className="w-full overflow-hidden">
+      <div className="flex flex-wrap gap-0.5 pb-1">
         {categories.map((category) => (
           <button
             key={category.id}
@@ -45,7 +45,9 @@ export function CategoryFilter() {
               "px-1 py-0.5 rounded-md text-xs whitespace-nowrap transition-all hover:scale-105",
               activeCategory === category.id
                 ? "bg-primary text-primary-foreground font-medium"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                : category.id === "Notes"
+                  ? "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
             )}
           >
             {category.emoji && <span className="mr-0.5">{category.emoji}</span>}
@@ -53,6 +55,6 @@ export function CategoryFilter() {
           </button>
         ))}
       </div>
-    </ScrollArea>
+    </div>
   );
 }
